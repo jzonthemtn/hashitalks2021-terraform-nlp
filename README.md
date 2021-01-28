@@ -1,7 +1,6 @@
-# Terraform OpenNLP Model Training and Evaluation
+# ML Models from Training to Serving: A Terraform Journey
 
-This repository contains the code for the 2021 HashiTalks presentation
-**ML Models from Training to Serving: A Terraform Journey**.
+This repository contains the code for the 2021 HashiTalks presentation.
 
 ## Abstract
 
@@ -13,4 +12,4 @@ Attendees of this talk will come away with a working knowledge of how a machine 
 
 ## Code
 
-The code in this repository creates the infrastructure required to automate the training of OpenNLP models. The AWS terraform scripts create a VPC for 
+The code in this repository creates the infrastructure required to automate the training and serving of NLP models in AWS.
