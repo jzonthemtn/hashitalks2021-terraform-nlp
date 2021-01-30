@@ -22,8 +22,9 @@ def obj_dict(obj):
     return obj.__dict__
 
 
+bucket = os.environ.get('MODEL_BUCKET')
 s3 = boto3.resource('s3')
-s3.Bucket('os.environ['BUCKET']).download_file('final-model.pt', '/tmp/final-model.pt')
+s3.Bucket(bucket).download_file('final-model.pt', '/tmp/final-model.pt')
 
 model = SequenceTagger.load('/tmp/final-model.pt')
 
