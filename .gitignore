@@ -2,5 +2,5 @@
 .terraform.*
 *.backup
 *.tfstate
-lambda_dist_pkg/
+lambda_function/
 *.zip

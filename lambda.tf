@@ -133,7 +133,7 @@ data "archive_file" "create_dist_pkg" {
 
 resource "aws_lambda_function" "aws_lambda_test" {
   function_name = var.function_name
-  description = "Process video and does face recognition..."
+  description = "NLP NER Model Training"
   handler = "lambda_function.lambda.lambda_handler"
   runtime = var.runtime
 
