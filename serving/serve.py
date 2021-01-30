@@ -23,7 +23,7 @@ def obj_dict(obj):
 
 
 s3 = boto3.resource('s3')
-s3.Bucket('mtnfog-temp').download_file('final-model.pt', '/tmp/final-model.pt')
+s3.Bucket('os.environ['BUCKET']).download_file('final-model.pt', '/tmp/final-model.pt')
 
 model = SequenceTagger.load('/tmp/final-model.pt')
 
