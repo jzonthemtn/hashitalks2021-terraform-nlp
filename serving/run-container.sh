@@ -10,4 +10,4 @@ docker run \
   -p 8080:8080 \
   -it \
   --rm \
-  jzemerick/ner-serve:$VERSION
+  jzemerick/ner-serving:$VERSION

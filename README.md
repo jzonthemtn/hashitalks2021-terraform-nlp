@@ -10,6 +10,24 @@ In this talk I will present a Terraform-managed architecture built in AWS to han
 
 Attendees of this talk will come away with a working knowledge of how a machine learning pipeline can be constructed and managed with Terraform. Knowledge of NLP is not required and all NLP concepts key to the talk will first be introduced. While the talk will use NLP as an example, the processes described will largely be generic and adaptable to other types of machine learning models. All code presented will be available on GitHub.
 
-## Code
+## Usage
 
-The code in this repository creates the infrastructure required to automate the training and serving of NLP models in AWS.
+To use the code in this repository first build the Docker images.
+
+Build the NLP NER training container:
+
+```
+cd training
+./build-image.sh
+docker push jzemerick/ner-training:latest
+```
+
+Now build the serving container:
+
+```
+cd serving
+./build-image.sh
+docker push jzemerick/ner-serve:latest
+```
+
+Now you can create the Terraform infrastructure.
