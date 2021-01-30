@@ -3,3 +3,4 @@
 *.backup
 *.tfstate
 lambda_dist_pkg/
+*.zip
