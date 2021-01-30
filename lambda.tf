@@ -126,7 +126,7 @@ resource "null_resource" "install_python_dependencies" {
 
 data "archive_file" "create_dist_pkg" {
   depends_on = ["null_resource.install_python_dependencies"]
-  source_dir = "${path.cwd}/lambda_dist_pkg/"
+  source_dir = "./lambda_function/"
   output_path = var.output_path
   type = "zip"
 }
@@ -144,12 +144,4 @@ resource "aws_lambda_function" "aws_lambda_test" {
   depends_on = [null_resource.install_python_dependencies]
   source_code_hash = data.archive_file.create_dist_pkg.output_base64sha256
   filename = data.archive_file.create_dist_pkg.output_path
-}
-
-resource "aws_lambda_permission" "allow_bucket" {
-  function_name = aws_lambda_function.aws_lambda_test.arn
-  source_arn = aws_s3_bucket.bucket_read_videos.arn
-  statement_id = "AllowExecutionFromS3Bucket"
-  action = "lambda:InvokeFunction"
-  principal = "s3.amazonaws.com"
 }
