@@ -14,3 +14,7 @@ output "queue_url" {
 resource "aws_s3_bucket" "ml-bucket" {
   acl = "private"
 }
+
+output "s3_bucket" {
+  value = aws_s3_bucket.ml-bucket.id
+}

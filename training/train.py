@@ -1,6 +1,7 @@
 import argparse
 import os
 import sys
+import boto3
 from typing import List
 from pathlib import Path
 
@@ -43,3 +44,5 @@ trainer.train('./',
               save_final_model=True,
               shuffle=True,
               embeddings_storage_mode='cpu')
+
+# Upload output files to S3.
