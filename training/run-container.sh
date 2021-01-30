@@ -16,8 +16,7 @@ mkdir -p $TRAINING_DIRECTORY
 
 # Run the training in the container.
 docker run \
-    -v "$TRAINING_DIRECTORY:/philter-ner-train" \
-    -v "$PHILTER_NER_MODELS_HOME/flair-data:/root/.flair" \
+    -v "$TRAINING_DIRECTORY:/ner-train" \
     --env "MODEL=my-model" \
     --env "EPOCHS=1" \
     --env "EMBEDDINGS=distilbert-base-cased" \
