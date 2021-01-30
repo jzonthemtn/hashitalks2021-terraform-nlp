@@ -2,5 +2,5 @@
 .terraform.*
 *.backup
 *.tfstate
-lambda_function/
-*.zip
+target/
+.idea/

@@ -37,7 +37,15 @@ cd serving
 docker push username/ner-serve:latest
 ```
 
-Now you are ready to create the Terraform infrastructure.
+### Building the Lambda Function
+
+The Lambda function is implemented in Java. The Lambda function controls the creation of ECS tasks.
+
+To build the Lambda function:
+
+```
+mvn clean package -f ./lambda-handler/pom.xml
+```
 
 ### Creating the infrastructure using Terraform
 

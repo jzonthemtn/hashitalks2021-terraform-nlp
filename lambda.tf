@@ -8,10 +8,6 @@ variable "function_name" {
   default = "aws_lambda_test"
 }
 
-variable "runtime" {
-  default = "python3.7"
-}
-
 variable "output_path" {
   description = "Path to function's deployment package into local filesystem. eg: /path/lambda_function.zip"
   default = "lambda_function.zip"
@@ -29,78 +25,6 @@ variable "bucket_for_videos" {
 
 # ===
 
-resource "aws_iam_role" "lambda_exec_role" {
-  name = "lambda_exec_role"
-  assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Effect": "Allow",
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      }
-    }
-  ]
-}
-EOF
-}
-
-data "aws_iam_policy_document" "lambda_policy_doc" {
-  statement {
-    sid = "AllowInvokingLambdas"
-    effect = "Allow"
-
-    resources = [
-      "arn:aws:lambda:*:*:function:*"
-    ]
-
-    actions = [
-      "lambda:InvokeFunction"
-    ]
-  }
-
-  statement {
-    sid = "AllowCreatingLogGroups"
-    effect = "Allow"
-
-    resources = [
-      "arn:aws:logs:*:*:*"
-    ]
-
-    actions = [
-      "logs:CreateLogGroup"
-    ]
-  }
-
-  statement {
-    sid = "AllowWritingLogs"
-    effect = "Allow"
-
-    resources = [
-      "arn:aws:logs:*:*:log-group:/aws/lambda/*:*"
-    ]
-
-    actions = [
-      "logs:CreateLogStream",
-      "logs:PutLogEvents",
-    ]
-  }
-}
-
-resource "aws_iam_policy" "lambda_iam_policy" {
-  name = "lambda_iam_policy"
-  policy = data.aws_iam_policy_document.lambda_policy_doc.json
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_policy_attachment" {
-  policy_arn = aws_iam_policy.lambda_iam_policy.arn
-  role = aws_iam_role.lambda_exec_role.name
-}
-
-# ===
-
 resource "aws_lambda_event_source_mapping" "event_source_mapping" {
   batch_size        = 1
   event_source_arn  = "${aws_sqs_queue.ml_queue.arn}"
@@ -110,38 +34,104 @@ resource "aws_lambda_event_source_mapping" "event_source_mapping" {
 
 # ===
 
-resource "null_resource" "install_python_dependencies" {
-  provisioner "local-exec" {
-    command = "bash ${path.module}/scripts/create_pkg.sh"
-
-    environment = {
-      source_code_path = var.path_source_code
-      function_name = var.function_name
-      path_module = path.module
-      runtime = var.runtime
-      path_cwd = path.cwd
-    }
-  }
-}
-
-data "archive_file" "create_dist_pkg" {
-  depends_on = ["null_resource.install_python_dependencies"]
-  source_dir = "./lambda_function/"
-  output_path = var.output_path
-  type = "zip"
+variable "lambda_payload_filename" {
+  default = "lambda-handler/target/java-events-1.0-SNAPSHOT.jar"
 }
 
 resource "aws_lambda_function" "aws_lambda_test" {
-  function_name = var.function_name
-  description = "NLP NER Model Training"
-  handler = "lambda_function.lambda.lambda_handler"
-  runtime = var.runtime
+  runtime          = "java11"
+  filename      = var.lambda_payload_filename
+  source_code_hash = filebase64sha256(var.lambda_payload_filename)
+  function_name = "java_lambda_function"
+  # lambda handler function name, it will be full class path name with package name
+  handler          = "package.Handler"
+  timeout = 60
+  memory_size = 256
+  role             = "${aws_iam_role.iam_role_for_lambda.arn}"
+  depends_on   = ["aws_cloudwatch_log_group.log_group"]
 
-  role = aws_iam_role.lambda_exec_role.arn
-  memory_size = 128
-  timeout = 300
+}
 
-  depends_on = [null_resource.install_python_dependencies]
-  source_code_hash = data.archive_file.create_dist_pkg.output_base64sha256
-  filename = data.archive_file.create_dist_pkg.output_path
+# lambda role
+resource "aws_iam_role" "iam_role_for_lambda" {
+  name = "lambda-invoke-role"
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Action": "sts:AssumeRole",
+        "Principal": {
+          "Service": "lambda.amazonaws.com"
+        },
+        "Effect": "Allow",
+        "Sid": ""
+      }
+    ]
+}
+EOF
+}
+
+# lambda policy
+resource "aws_iam_policy" "iam_policy_for_lambda" {
+  name = "lambda-invoke-policy"
+  path = "/"
+
+  policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+      {
+        "Sid": "LambdaPolicy",
+        "Effect": "Allow",
+        "Action": [
+          "cloudwatch:PutMetricData",
+          "ec2:DescribeNetworkInterfaces",
+          "ec2:CreateNetworkInterface",
+          "ec2:DeleteNetworkInterface",
+          "logs:CreateLogStream",
+          "logs:PutLogEvents",
+          "xray:PutTelemetryRecords",
+          "xray:PutTraceSegments"
+        ],
+        "Resource": "*"
+      },
+      {
+    "Sid": "",
+    "Effect": "Allow",
+    "Action": [
+        "sqs:*"
+    ],
+    "Resource": "*"
+}
+    ]
+  }
+EOF
+}
+
+# Attach the policy to the role
+resource "aws_iam_role_policy_attachment" "aws_iam_role_policy_attachment" {
+  role       = "${aws_iam_role.iam_role_for_lambda.name}"
+  policy_arn = "${aws_iam_policy.iam_policy_for_lambda.arn}"
+}
+
+# ===
+
+resource "aws_cloudwatch_log_group" "log_group" {
+  name = "/aws/lambda/java_lambda_function"
+}
+
+# allow lambda to log to cloudwatch
+data "aws_iam_policy_document" "cloudwatch_log_group_access_document" {
+  statement {
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+
+    resources = [
+      "arn:aws:logs:::*",
+    ]
+  }
 }
