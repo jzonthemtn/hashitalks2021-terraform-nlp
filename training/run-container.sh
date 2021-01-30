@@ -21,7 +21,7 @@ docker run \
     --env "EPOCHS=1" \
     --env "EMBEDDINGS=distilbert-base-cased" \
     --rm \
-    jzemerick/ner-train:$CONTAINER_VERSION
+    jzemerick/ner-training:$CONTAINER_VERSION
 
 
 # --runtime=nvidia \
