@@ -7,6 +7,10 @@ resource "aws_sqs_queue" "ml_queue" {
   visibility_timeout_seconds = 60
 }
 
+output "queue_url" {
+  value = aws_sqs_queue.ml_queue.id
+}
+
 resource "aws_s3_bucket" "ml-bucket" {
   acl = "private"
 }
