@@ -1,8 +1,9 @@
 #!/bin/bash
 set -e
 QUEUE_URL=`terraform output -raw queue_url`
+MODEL_NAME=${1:-"my-model"}
 
 echo "Publishing message to SQS queue $QUEUE_URL"
 aws sqs send-message \
   --queue-url $QUEUE_URL \
-  --message-body '{"name": "my-model"}'
+  --message-body "{\"name\": \"$MODEL_NAME\"}"

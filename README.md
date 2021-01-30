@@ -2,7 +2,7 @@
 
 This repository contains the code for the 2021 HashiTalks presentation. This project facilitates the automated training and serving of NLP NER models on AWS.
 
-## Abstract
+## Presentation Abstract
 
 As machine learning becomes more pervasive across industries the need to automate the deployment of the required infrastructure becomes even more important. The ability to efficiently and automatically provision infrastructure for modeling training, evaluation, and serving becomes an important component of a successful ML pipeline
 
@@ -16,7 +16,7 @@ To get started first clone this repository.
 
 ### Building the Containers
 
-This project uses Docker containers for model training and serving. One container is used for training an NLP NER model and another container is used to serve a model via a simple REST API.
+This project uses Docker containers for model training and serving. One container is used for training an NLP NER model and another container is used to serve a model via a simple REST API. Refer to each container's Dockerfile for details on the training and serving. The NLP is handled by [Flair](https://github.com/flairNLP/flair).
 
 * You will want to modify the `build-image.sh` scripts to use your DockerHub username instead of mine.
 * You also need to update the DockerHub username in the Terraform scripts regarding the image definitions.
@@ -69,13 +69,17 @@ To delete the resources and clean up:
 terraform destroy
 ```
 
+#### Lambda Function
+
+The Lambda function is deployed via the Terraform scripts. It is a Java 11 function that is triggered when a message is published to the SQS queue.
+
 ### Training a Model
 
-To train a model, publish a message to the SQS queue. Using the `publish.sh` scripts. Look at the contents of this script to change things such as the number of epochs and embeddings. The only required argument is the name of the model to train, shown below as `my-model`.
+To train a model, publish a message to the SQS queue. Using the `queue-training.sh` scripts. Look at the contents of this script to change things such as the number of epochs and embeddings. The only required argument is the name of the model to train, shown below as `my-model`.
 
-`./scripts/publish.sh my-model`
+`./scripts/queue-training.sh my-model`
 
-This publishes a message to the SQS queue which will be picked up by the Lambda function. The Lambda function will consume the message and launch a model training container on the ECS cluster. When model training is complete, the model and its associated files will be uploaded to the S3 bucket.
+This publishes a message to the SQS queue which will trigger the Lambda function. The Lambda function will consume the message and launch a model training container on the ECS cluster. When model training is complete, the model and its associated files will be uploaded to the S3 bucket by the container prior to exiting.
 
 ### Serving a Model
 
