@@ -4,7 +4,9 @@ from flair.models import SequenceTagger
 from flair.data import Sentence
 import cherrypy
 import json
+import boto3
 from textblob import TextBlob
+import os
 
 
 class Span:
@@ -19,8 +21,11 @@ class Span:
 def obj_dict(obj):
     return obj.__dict__
 
-# Download the model from S3.
-model = SequenceTagger.load('final-model.pt')
+
+s3 = boto3.resource('s3')
+s3.Bucket('mtnfog-temp').download_file('final-model.pt', '/tmp/final-model.pt')
+
+model = SequenceTagger.load('/tmp/final-model.pt')
 
 class NerModelService(object):
 
@@ -57,5 +62,5 @@ class NerModelService(object):
 
 
 if __name__ == '__main__':
-    cherrypy.config.update({'server.socket_host': '0.0.0.0', 'server.socket_port': 18080})
+    cherrypy.config.update({'server.socket_host': '0.0.0.0', 'server.socket_port': 8080})
     cherrypy.quickstart(NerModelService())
