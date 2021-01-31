@@ -18,10 +18,12 @@ To get started first clone this repository.
 
 This project uses Docker containers for model training and serving. One container is used for training an NLP NER model and another container is used to serve a model via a simple REST API. Refer to each container's Dockerfile for details on the training and serving. The NLP is handled by [Flair](https://github.com/flairNLP/flair).
 
+**Important First Steps**
+
 * You will want to modify the `build-image.sh` scripts to use your DockerHub username instead of mine.
 * You also need to update the DockerHub username in the Terraform scripts regarding the image definitions.
 
-Build and push the NLP NER training container:
+Now you can build and push the NLP NER training container:
 
 ```
 cd training
