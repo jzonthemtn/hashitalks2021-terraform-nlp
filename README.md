@@ -94,3 +94,8 @@ curl -X POST http://$HOSTNAME:8080/ner --data "George Washington was president o
 ```
 
 The response will be a JSON-encoded list of entities (`George Washington` and `United States`) from the text.
+
+## License
+
+This project is licensed under the Apache License, version 2.0.
+Copyright 2021 Jeff Zemerick
