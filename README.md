@@ -1,6 +1,6 @@
 # ML Models from Training to Serving: A Terraform Journey
 
-This repository contains the code for the 2021 HashiTalks presentation. This project facilitates the automated training and serving of NLP NER models on AWS.
+This repository contains the code for the [HashiTalks 2021](https://events.hashicorp.com/hashitalks2021) presentation. This project facilitates the automated training and serving of NLP NER models on AWS.
 
 ## Presentation Abstract
 
@@ -79,7 +79,7 @@ To train a model, publish a message to the SQS queue. Using the `queue-training.
 
 `./scripts/queue-training.sh my-model`
 
-This publishes a message to the SQS queue which will trigger the Lambda function. The Lambda function will consume the message and launch a model training container on the ECS cluster. When model training is complete, the model and its associated files will be uploaded to the S3 bucket by the container prior to exiting.
+This publishes a message to the SQS queue which describes a desired model training. The Lambda function will be triggered by a Cloud Watch EventBridge (Events) rule. The function will consume the message(s) from the queue and launch a model training container on the ECS cluster if the cluster's number of running tasks is below a set threshold. When model training is complete, the model and its associated files will be uploaded to the S3 bucket by the container prior to exiting.
 
 ### Serving a Model
 
