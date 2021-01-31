@@ -33,9 +33,9 @@ resource "aws_lambda_function" "aws_lambda_test" {
   runtime          = "java11"
   filename      = var.lambda_payload_filename
   source_code_hash = filebase64sha256(var.lambda_payload_filename)
-  function_name = "java_lambda_function"
+  function_name = "nlp-consumer-function"
   # lambda handler function name, it will be full class path name with package name
-  handler          = "package.Handler"
+  handler          = "example.Handler"
   timeout = 60
   memory_size = 256
   role             = "${aws_iam_role.iam_role_for_lambda.arn}"
@@ -80,8 +80,13 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
           "ec2:DescribeNetworkInterfaces",
           "ec2:CreateNetworkInterface",
           "ec2:DeleteNetworkInterface",
+          "ecs:*",
           "logs:CreateLogStream",
           "logs:PutLogEvents",
+          "logs:CreateLogStream",
+          "logs:DescribeLogStreams",
+          "logs:PutRetentionPolicy",
+          "logs:CreateLogGroup",
           "xray:PutTelemetryRecords",
           "xray:PutTraceSegments"
         ],

@@ -7,6 +7,7 @@ import com.amazonaws.services.ecs.model.DescribeTasksResult;
 import com.amazonaws.services.lambda.runtime.Context;
 import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.RequestHandler;
+import com.amazonaws.services.lambda.runtime.events.ScheduledEvent;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
@@ -16,7 +17,7 @@ import example.model.ModelTrainingRequest;
 
 import java.util.List;
 
-public class Handler implements RequestHandler<String, String> {
+public class Handler implements RequestHandler<ScheduledEvent, String> {
 
   private static final String QUEUE_NAME = "ml-queue";
   private static final String ECS_CLUSTER_NAME = "nlp";
@@ -25,7 +26,7 @@ public class Handler implements RequestHandler<String, String> {
   private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   @Override
-  public String handleRequest(String event, Context context) {
+  public String handleRequest(ScheduledEvent event, Context context) {
 
     final LambdaLogger logger = context.getLogger();
     logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
