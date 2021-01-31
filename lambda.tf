@@ -25,15 +25,6 @@ variable "bucket_for_videos" {
 
 # ===
 
-resource "aws_lambda_event_source_mapping" "event_source_mapping" {
-  batch_size        = 1
-  event_source_arn  = "${aws_sqs_queue.ml_queue.arn}"
-  enabled           = true
-  function_name     = "${aws_lambda_function.aws_lambda_test.arn}"
-}
-
-# ===
-
 variable "lambda_payload_filename" {
   default = "lambda-handler/target/java-events-1.0-SNAPSHOT.jar"
 }
@@ -113,25 +104,4 @@ EOF
 resource "aws_iam_role_policy_attachment" "aws_iam_role_policy_attachment" {
   role       = "${aws_iam_role.iam_role_for_lambda.name}"
   policy_arn = "${aws_iam_policy.iam_policy_for_lambda.arn}"
-}
-
-# ===
-
-resource "aws_cloudwatch_log_group" "log_group" {
-  name = "/aws/lambda/java_lambda_function"
-}
-
-# allow lambda to log to cloudwatch
-data "aws_iam_policy_document" "cloudwatch_log_group_access_document" {
-  statement {
-    actions = [
-      "logs:CreateLogGroup",
-      "logs:CreateLogStream",
-      "logs:PutLogEvents"
-    ]
-
-    resources = [
-      "arn:aws:logs:::*",
-    ]
-  }
 }

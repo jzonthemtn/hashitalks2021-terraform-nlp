@@ -1,7 +1,6 @@
 import argparse
 import os
 import sys
-import boto3
 from typing import List
 from pathlib import Path
 
@@ -35,7 +34,7 @@ tagger: SequenceTagger = SequenceTagger(hidden_size=256,
 
 trainer: ModelTrainer = ModelTrainer(tagger, corpus, use_tensorboard=True)
 
-trainer.train('./',
+trainer.train('./' + args.model,
               learning_rate=0.1,
               mini_batch_size=32,
               max_epochs=int(args.epochs),
@@ -44,5 +43,3 @@ trainer.train('./',
               save_final_model=True,
               shuffle=True,
               embeddings_storage_mode='cpu')
-
-# Upload output files to S3.
