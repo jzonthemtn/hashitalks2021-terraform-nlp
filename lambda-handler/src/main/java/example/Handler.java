@@ -32,7 +32,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
     final AmazonECS ecs = AmazonECSClientBuilder.defaultClient();
     final AmazonSQS sqs = AmazonSQSClientBuilder.defaultClient();
-    
+
     final String queueUrl = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl();
     final List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
 
@@ -56,10 +56,10 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
     }
 
-    logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
-    logger.log("CONTEXT: " + gson.toJson(context));
-    logger.log("EVENT: " + gson.toJson(event));
-    logger.log("EVENT TYPE: " + event.getClass().toString());
+    //logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
+    //logger.log("CONTEXT: " + gson.toJson(context));
+    //logger.log("EVENT: " + gson.toJson(event));
+    //logger.log("EVENT TYPE: " + event.getClass().toString());
 
     return "done";
 
