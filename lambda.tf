@@ -39,7 +39,7 @@ resource "aws_lambda_function" "aws_lambda_test" {
   timeout     = 60
   memory_size = 256
   role        = aws_iam_role.iam_role_for_lambda.arn
-  depends_on  = ["aws_cloudwatch_log_group.log_group"]
+  depends_on  = [aws_cloudwatch_log_group.log_group]
 
 }
 
