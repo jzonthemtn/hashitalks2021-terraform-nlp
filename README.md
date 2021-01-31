@@ -1,8 +1,12 @@
 # ML Models from Training to Serving: A Terraform Journey
 
-This repository contains the code for the [HashiTalks 2021](https://events.hashicorp.com/hashitalks2021) presentation. This project facilitates the automated training and serving of NLP NER models on AWS.
+This repository contains the code for the [HashiTalks 2021](https://events.hashicorp.com/hashitalks2021) presentation.
 
-## Presentation Abstract
+## Summary
+
+This project facilitates the automated training and serving of NLP named-entity recognition models on AWS.
+
+### Presentation Abstract
 
 As machine learning becomes more pervasive across industries the need to automate the deployment of the required infrastructure becomes even more important. The ability to efficiently and automatically provision infrastructure for modeling training, evaluation, and serving becomes an important component of a successful ML pipeline
 
