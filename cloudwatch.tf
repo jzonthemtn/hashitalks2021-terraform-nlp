@@ -24,7 +24,7 @@ resource "aws_cloudwatch_event_rule" "every_one_minute" {
 }
 
 resource "aws_cloudwatch_event_target" "check_foo_every_one_minute" {
-  rule      = "${aws_cloudwatch_event_rule.every_one_minute.name}"
+  rule      = aws_cloudwatch_event_rule.every_one_minute.name
   target_id = "lambda"
   arn       = aws_lambda_function.aws_lambda_test.arn
 }

@@ -10,17 +10,17 @@ variable "function_name" {
 
 variable "output_path" {
   description = "Path to function's deployment package into local filesystem. eg: /path/lambda_function.zip"
-  default = "lambda_function.zip"
+  default     = "lambda_function.zip"
 }
 
 variable "distribution_pkg_folder" {
   description = "Folder name to create distribution files..."
-  default = "lambda_dist_pkg"
+  default     = "lambda_dist_pkg"
 }
 
 variable "bucket_for_videos" {
   description = "Bucket name for put videos to process..."
-  default = "aws-lambda-function-read-videos"
+  default     = "aws-lambda-function-read-videos"
 }
 
 # ===
@@ -31,21 +31,21 @@ variable "lambda_payload_filename" {
 
 resource "aws_lambda_function" "aws_lambda_test" {
   runtime          = "java11"
-  filename      = var.lambda_payload_filename
+  filename         = var.lambda_payload_filename
   source_code_hash = filebase64sha256(var.lambda_payload_filename)
-  function_name = "nlp-consumer-function"
+  function_name    = "nlp-consumer-function"
   # lambda handler function name, it will be full class path name with package name
-  handler          = "example.Handler"
-  timeout = 60
+  handler     = "example.Handler"
+  timeout     = 60
   memory_size = 256
-  role             = "${aws_iam_role.iam_role_for_lambda.arn}"
-  depends_on   = ["aws_cloudwatch_log_group.log_group"]
+  role        = aws_iam_role.iam_role_for_lambda.arn
+  depends_on  = ["aws_cloudwatch_log_group.log_group"]
 
 }
 
 # lambda role
 resource "aws_iam_role" "iam_role_for_lambda" {
-  name = "lambda-invoke-role"
+  name               = "lambda-invoke-role"
   assume_role_policy = <<EOF
 {
     "Version": "2012-10-17",
@@ -107,6 +107,6 @@ EOF
 
 # Attach the policy to the role
 resource "aws_iam_role_policy_attachment" "aws_iam_role_policy_attachment" {
-  role       = "${aws_iam_role.iam_role_for_lambda.name}"
-  policy_arn = "${aws_iam_policy.iam_policy_for_lambda.arn}"
+  role       = aws_iam_role.iam_role_for_lambda.name
+  policy_arn = aws_iam_policy.iam_policy_for_lambda.arn
 }

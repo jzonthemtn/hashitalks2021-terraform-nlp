@@ -54,20 +54,20 @@ variable "mapPublicIP" {
 
 variable "ecs_cluster" {
   description = "ECS cluster name"
-  default = "nlp-ecs"
+  default     = "nlp-ecs"
 }
 
 variable "max_instance_size" {
   description = "Maximum number of instances in the cluster"
-  default = 1
+  default     = 1
 }
 
 variable "min_instance_size" {
   description = "Minimum number of instances in the cluster"
-  default = 1
+  default     = 1
 }
 
 variable "desired_capacity" {
   description = "Desired number of instances in the cluster"
-  default = 1
+  default     = 1
 }

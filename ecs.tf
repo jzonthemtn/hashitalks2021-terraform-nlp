@@ -51,28 +51,28 @@ resource "aws_route_table_association" "ml_vpc_association" {
 # ===
 
 resource "aws_security_group" "ecs_sg" {
-    vpc_id      = aws_vpc.ml_vpc.id
+  vpc_id = aws_vpc.ml_vpc.id
 
-    ingress {
-        from_port       = 22
-        to_port         = 22
-        protocol        = "tcp"
-        cidr_blocks     = ["0.0.0.0/0"]
-    }
+  ingress {
+    from_port   = 22
+    to_port     = 22
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-    ingress {
-        from_port       = 8080
-        to_port         = 8080
-        protocol        = "tcp"
-        cidr_blocks     = ["0.0.0.0/0"]
-    }
+  ingress {
+    from_port   = 8080
+    to_port     = 8080
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 
-    egress {
-        from_port       = 0
-        to_port         = 65535
-        protocol        = "tcp"
-        cidr_blocks     = ["0.0.0.0/0"]
-    }
+  egress {
+    from_port   = 0
+    to_port     = 65535
+    protocol    = "tcp"
+    cidr_blocks = ["0.0.0.0/0"]
+  }
 }
 
 # =====
@@ -106,29 +106,29 @@ resource "aws_iam_instance_profile" "ecs_agent" {
 # ===
 
 resource "aws_launch_configuration" "ecs_launch_config" {
-    image_id             = "ami-005b753c07ecef59f"
-    iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
-    security_groups      = [aws_security_group.ecs_sg.id]
-    user_data            = "#!/bin/bash\necho ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config"
-    instance_type        = "t3.large"
+  image_id             = "ami-005b753c07ecef59f"
+  iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
+  security_groups      = [aws_security_group.ecs_sg.id]
+  user_data            = "#!/bin/bash\necho ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config"
+  instance_type        = "t3.large"
 }
 
 resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
-    name                      = "asg"
-    vpc_zone_identifier       = [aws_subnet.ml_vpc_subnet.id]
-    launch_configuration      = aws_launch_configuration.ecs_launch_config.name
+  name                 = "asg"
+  vpc_zone_identifier  = [aws_subnet.ml_vpc_subnet.id]
+  launch_configuration = aws_launch_configuration.ecs_launch_config.name
 
-    desired_capacity          = 1
-    min_size                  = 1
-    max_size                  = 2
-    health_check_grace_period = 300
-    health_check_type         = "EC2"
+  desired_capacity          = 1
+  min_size                  = 1
+  max_size                  = 2
+  health_check_grace_period = 300
+  health_check_type         = "EC2"
 }
 
 # ===
 
 resource "aws_ecs_cluster" "ecs_cluster" {
-    name  = var.cluster_name
+  name = var.cluster_name
 }
 
 # ===
