@@ -11,6 +11,8 @@ provider "aws" {
   region = var.region
 }
 
+data "aws_region" "current" {}
+
 resource "aws_vpc" "ml_vpc" {
   cidr_block           = var.vpcCIDRblock
   instance_tenancy     = var.instanceTenancy

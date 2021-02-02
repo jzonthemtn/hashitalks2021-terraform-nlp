@@ -19,9 +19,6 @@ import java.util.*;
 
 public class Handler implements RequestHandler<ScheduledEvent, String> {
 
-  private static final String ECS_CLUSTER_NAME = "nlp";
-  private static final int MAX_TASKS = 2;
-
   private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
   @Override
@@ -29,11 +26,17 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
     final LambdaLogger logger = context.getLogger();
 
+    final String ecsClusterName = System.getenv("ecs_cluster_name");
+    logger.log("Using ECS cluster " + ecsClusterName);
+
     final String queueUrl = System.getenv("queue_url");
     logger.log("Using SQS queue " + queueUrl);
 
-    final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
-    final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
+    final String region = System.getenv("region");
+    logger.log("Using region " + region);
+
+    final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(region).build();
+    final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(region).build();
 
     final List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
 
@@ -42,6 +45,9 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
       logger.log("No messages were consumed.");
 
     } else {
+
+      final int maxTasks = Integer.valueOf(System.getenv("max_tasks"));
+      final String trainingImage = System.getenv("training_image");
 
       for (final Message message : messages) {
 
@@ -54,7 +60,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         containerDefinition.setName(modelTrainingRequest.getName());
         containerDefinition.setMemoryReservation(100);
         containerDefinition.setMemory(4096);
-        containerDefinition.setImage("jzemerick/ner-training:latest");
+        containerDefinition.setImage(trainingImage);
 
         final LogConfiguration logConfiguration = new LogConfiguration();
         logConfiguration.setLogDriver("awslogs");
@@ -96,7 +102,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
         final CreateServiceRequest createServiceRequest = new CreateServiceRequest();
         createServiceRequest.setServiceName(modelId);
-        createServiceRequest.setCluster(ECS_CLUSTER_NAME);
+        createServiceRequest.setCluster(ecsClusterName);
         createServiceRequest.setDesiredCount(1);
         createServiceRequest.setTaskDefinition(modelTrainingRequest.getName());
         createServiceRequest.setDeploymentController(deploymentController);

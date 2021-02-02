@@ -110,7 +110,7 @@ resource "aws_launch_configuration" "ecs_launch_config" {
   iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
   security_groups      = [aws_security_group.ecs_sg.id]
   user_data            = "#!/bin/bash\necho ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config"
-  instance_type        = "t3.large"
+  instance_type        = "c5.xlarge"
 }
 
 resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {

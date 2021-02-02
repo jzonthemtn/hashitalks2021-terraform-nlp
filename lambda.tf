@@ -29,17 +29,20 @@ resource "aws_lambda_function" "aws_lambda_test" {
   filename         = var.lambda_payload_filename
   source_code_hash = filebase64sha256(var.lambda_payload_filename)
   function_name    = "nlp-consumer-function"
-  # lambda handler function name, it will be full class path name with package name
-  handler     = "example.Handler"
-  timeout     = 60
-  memory_size = 256
-  role        = aws_iam_role.iam_role_for_lambda.arn
-  depends_on  = [aws_cloudwatch_log_group.log_group]
+  handler          = "example.Handler"
+  timeout          = 60
+  memory_size      = 256
+  role             = aws_iam_role.iam_role_for_lambda.arn
+  depends_on       = [aws_cloudwatch_log_group.log_group]
   environment {
     variables = {
-      s3_bucket = aws_s3_bucket.ml_bucket.id
-      aws_logs_group = aws_cloudwatch_log_group.nlp-training.name
-      queue_url = aws_sqs_queue.ml_queue.id
+      s3_bucket        = aws_s3_bucket.ml_bucket.id
+      aws_logs_group   = aws_cloudwatch_log_group.nlp-training.name
+      queue_url        = aws_sqs_queue.ml_queue.id
+      ecs_cluster_name = var.cluster_name
+      region           = data.aws_region.current.name
+      max_tasks        = 1
+      training_image   = "jzemerick/ner-training:latest"
     }
   }
 }
