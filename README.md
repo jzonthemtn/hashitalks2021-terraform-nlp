@@ -47,10 +47,10 @@ docker push username/ner-serve:latest
 
 The Lambda function is implemented in Java. The Lambda function controls the creation of ECS tasks.
 
-To build the Lambda function:
+To build the Lambda function, run `build.sh` or the command:
 
 ```
-mvn clean package -f ./lambda-handler/pom.xml
+mvn clean package -f ./lambda-handler/pom.xml -DskipTests=true
 ```
 
 ### Creating the infrastructure using Terraform
