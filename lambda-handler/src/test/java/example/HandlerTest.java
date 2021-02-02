@@ -1,6 +1,7 @@
 package example;
 
 import com.amazonaws.services.lambda.runtime.Context;
+import com.amazonaws.services.lambda.runtime.LambdaLogger;
 import com.amazonaws.services.lambda.runtime.events.ScheduledEvent;
 import org.junit.Test;
 import org.mockito.Mockito;
@@ -11,18 +12,32 @@ import static org.mockito.Mockito.when;
 
 public class HandlerTest {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(HandlerTest.class);
-
     @Test
     public void invokeTest() {
 
         final ScheduledEvent event = Mockito.mock(ScheduledEvent.class);
 
         final Context context = Mockito.mock(Context.class);
-        when(context.getLogger()).thenReturn(new TestLogger());
+        when(context.getLogger()).thenReturn(new MockLogger());
 
         final Handler handler = new Handler();
-        final String result = handler.handleRequest(event, context);
+        handler.handleRequest(event, context);
+
+    }
+
+    public static class MockLogger implements LambdaLogger {
+
+        private static final Logger LOGGER = LoggerFactory.getLogger(MockLogger.class);
+
+        @Override
+        public void log(String message) {
+            LOGGER.info(message);
+        }
+
+        @Override
+        public void log(byte[] message) {
+            LOGGER.info(new String(message));
+        }
 
     }
 

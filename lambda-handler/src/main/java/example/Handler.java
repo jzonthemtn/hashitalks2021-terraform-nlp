@@ -56,6 +56,8 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
         logger.log("Received training request for model " + modelTrainingRequest.getName() + " (" + modelId + ")");
 
+        // TODO: Check to see if we are under the maximum.
+
         final ContainerDefinition containerDefinition = new ContainerDefinition();
         containerDefinition.setName(modelTrainingRequest.getName());
         containerDefinition.setMemoryReservation(100);
@@ -83,19 +85,12 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         environmentVariables.add(new KeyValuePair().withName("S3_BUCKET").withValue(s3Bucket));
         containerDefinition.setEnvironment(environmentVariables);
 
-        /*PortMapping portMapping = new PortMapping();
-        portMapping.setContainerPort(containerPort);
-        portMapping.setProtocol(Tcp);
-        containerDefinition.setPortMappings(singletonList(portMapping));*/
-
         final RegisterTaskDefinitionRequest registerTaskDefinitionRequest = new RegisterTaskDefinitionRequest();
         registerTaskDefinitionRequest.setNetworkMode(NetworkMode.Host);
         registerTaskDefinitionRequest.setContainerDefinitions(Arrays.asList(containerDefinition));
         registerTaskDefinitionRequest.setFamily(modelTrainingRequest.getName());
 
         final RegisterTaskDefinitionResult registerTaskDefinitionResult = ecs.registerTaskDefinition(registerTaskDefinitionRequest);
-
-        // ----
 
         final DeploymentController deploymentController = new DeploymentController();
         deploymentController.setType("ECS");
@@ -110,32 +105,6 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);
 
         sqs.deleteMessage(queueUrl, message.getReceiptHandle());
-
-        // How many models are currently being trained?
-
-      /*final ListTasksRequest listTasksRequest = new ListTasksRequest();
-      listTasksRequest.setCluster(ECS_CLUSTER_NAME);
-      listTasksRequest.setServiceName(NLP_SERVING_SERVICE);
-
-      final ListTasksResult listTasksResult = ecs.listTasks(listTasksRequest);
-      final int tasks = listTasksResult.getTaskArns().size();
-
-      logger.log("Current ECS tasks is " + tasks);
-
-      if(tasks < MAX_TASKS) {
-
-        // Start a new task.
-        logger.log("Starting a new model training task.");
-
-        final CreateServiceRequest createServiceRequest = new CreateServiceRequest();
-        createServiceRequest.setServiceName();
-
-        ecs.runTask()
-
-        // Delete the message from the queue.
-        sqs.deleteMessage(queueUrl, message.getReceiptHandle());
-
-      }*/
 
       }
 
