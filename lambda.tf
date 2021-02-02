@@ -18,11 +18,6 @@ variable "distribution_pkg_folder" {
   default     = "lambda_dist_pkg"
 }
 
-variable "bucket_for_videos" {
-  description = "Bucket name for put videos to process..."
-  default     = "aws-lambda-function-read-videos"
-}
-
 # ===
 
 variable "lambda_payload_filename" {
