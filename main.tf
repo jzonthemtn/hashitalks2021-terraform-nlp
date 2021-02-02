@@ -63,3 +63,7 @@ resource "aws_s3_bucket" "ml_bucket" {
 output "s3_bucket" {
   value = aws_s3_bucket.ml_bucket.id
 }
+
+output "ecs_cluster_name" {
+  value = var.cluster_name
+}
