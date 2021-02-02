@@ -39,6 +39,7 @@ resource "aws_lambda_function" "aws_lambda_test" {
     variables = {
       s3_bucket = aws_s3_bucket.ml_bucket.id
       aws_logs_group = aws_cloudwatch_log_group.nlp-training.name
+      queue_url = aws_sqs_queue.ml_queue.id
     }
   }
 }
@@ -94,7 +95,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
       {
          "Effect":"Allow",
          "Action":["sqs:*"],
-         "Resource":"arn:aws:s3:::${aws_sqs_queue.ml_queue.arn}"
+         "Resource":"arn:aws:sqs::${aws_sqs_queue.ml_queue.arn}"
       },
       {
          "Effect":"Allow",

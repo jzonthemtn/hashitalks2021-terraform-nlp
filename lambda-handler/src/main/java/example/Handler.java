@@ -19,7 +19,6 @@ import java.util.*;
 
 public class Handler implements RequestHandler<ScheduledEvent, String> {
 
-  private static final String QUEUE_NAME = "ml-queue";
   private static final String ECS_CLUSTER_NAME = "nlp";
   private static final int MAX_TASKS = 2;
 
@@ -30,10 +29,12 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
     final LambdaLogger logger = context.getLogger();
 
+    final String queueUrl = System.getenv("queue_url");
+    logger.log("Using SQS queue " + queueUrl);
+
     final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
     final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(Regions.US_EAST_1).build();
 
-    final String queueUrl = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl();
     final List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
 
     if(messages.isEmpty()) {
@@ -101,7 +102,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         createServiceRequest.setDeploymentController(deploymentController);
 
         final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);
-        
+
         sqs.deleteMessage(queueUrl, message.getReceiptHandle());
 
         // How many models are currently being trained?
