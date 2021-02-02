@@ -40,3 +40,24 @@ resource "aws_subnet" "ml_vpc_subnet_2" {
     Name = "ml-subnet-2"
   }
 }
+
+resource "aws_sqs_queue" "ml_queue" {
+  name                       = "ml-queue"
+  delay_seconds              = 10
+  max_message_size           = 2048
+  message_retention_seconds  = 1209600
+  receive_wait_time_seconds  = 10
+  visibility_timeout_seconds = 60
+}
+
+output "queue_url" {
+  value = aws_sqs_queue.ml_queue.id
+}
+
+resource "aws_s3_bucket" "ml_bucket" {
+  acl = "private"
+}
+
+output "s3_bucket" {
+  value = aws_s3_bucket.ml_bucket.id
+}

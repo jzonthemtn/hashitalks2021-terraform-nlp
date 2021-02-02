@@ -88,13 +88,20 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
         "Resource": "*"
       },
       {
-    "Sid": "",
-    "Effect": "Allow",
-    "Action": [
-        "sqs:*"
-    ],
-    "Resource": "*"
-}
+         "Effect":"Allow",
+         "Action":["sqs:*"],
+         "Resource":"arn:aws:s3:::${aws_sqs_queue.ml_queue.arn}"
+      },
+      {
+         "Effect":"Allow",
+         "Action":["s3:ListBucket"],
+         "Resource":"arn:aws:s3:::${aws_s3_bucket.ml_bucket.id}"
+      },
+      {
+         "Effect":"Allow",
+         "Action":["s3:PutObject"],
+         "Resource":"arn:aws:s3:::${aws_s3_bucket.ml_bucket.id}/*"
+      }
     ]
   }
 EOF
