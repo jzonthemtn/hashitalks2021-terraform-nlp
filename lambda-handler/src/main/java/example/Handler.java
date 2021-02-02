@@ -15,16 +15,13 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import example.model.ModelTrainingRequest;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class Handler implements RequestHandler<ScheduledEvent, String> {
 
   private static final String QUEUE_NAME = "ml-queue";
   private static final String ECS_CLUSTER_NAME = "nlp";
   private static final int MAX_TASKS = 2;
-  private static final String NLP_SERVING_SERVICE = "serving";
-  private static final String NLP_TRAINING_SERVICE = "training";
 
   private final Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
@@ -39,15 +36,75 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
     final String queueUrl = sqs.getQueueUrl(QUEUE_NAME).getQueueUrl();
     final List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
 
-    for(final Message message : messages) {
+    if(messages.isEmpty()) {
 
-      final ModelTrainingRequest modelTrainingRequest = gson.fromJson(message.getBody(), ModelTrainingRequest.class);
+      logger.log("No messages were consumed.");
 
-      logger.log("Received training request for model " + modelTrainingRequest.getName());
+    } else {
 
-      // How many models are currently being trained?
+      for (final Message message : messages) {
 
-      final ListTasksRequest listTasksRequest = new ListTasksRequest();
+        final ModelTrainingRequest modelTrainingRequest = gson.fromJson(message.getBody(), ModelTrainingRequest.class);
+        final String modelId = modelTrainingRequest.getName() + "-" + UUID.randomUUID().toString();
+
+        logger.log("Received training request for model " + modelTrainingRequest.getName() + "(" + modelId + ")");
+
+        final ContainerDefinition containerDefinition = new ContainerDefinition();
+        containerDefinition.setName(modelTrainingRequest.getName());
+        containerDefinition.setMemoryReservation(100);
+        containerDefinition.setMemory(4096);
+        containerDefinition.setImage("jzemerick/ner-training:latest");
+
+        final LogConfiguration logConfiguration = new LogConfiguration();
+        logConfiguration.setLogDriver("awslogs");
+
+        final Map<String, String> options = new LinkedHashMap<>();
+        options.put("awslogs-group", "nlp-training");
+        options.put("awslogs-region", Regions.US_EAST_1.getName());
+        options.put("awslogs-stream-prefix", modelId);
+        logConfiguration.setOptions(options);
+        containerDefinition.setLogConfiguration(logConfiguration);
+
+        final Collection<KeyValuePair> environmentVariables = new LinkedList<>();
+        environmentVariables.add(new KeyValuePair().withName("MODEL").withValue(modelTrainingRequest.getName()));
+        environmentVariables.add(new KeyValuePair().withName("EPOCHS").withValue("1"));
+        environmentVariables.add(new KeyValuePair().withName("EMBEDDINGS").withValue("distilbert-base-cased"));
+        environmentVariables.add(new KeyValuePair().withName("S3_BUCKET").withValue("mtnfog-temp"));
+        containerDefinition.setEnvironment(environmentVariables);
+
+        /*PortMapping portMapping = new PortMapping();
+        portMapping.setContainerPort(containerPort);
+        portMapping.setProtocol(Tcp);
+        containerDefinition.setPortMappings(singletonList(portMapping));*/
+
+        final RegisterTaskDefinitionRequest registerTaskDefinitionRequest = new RegisterTaskDefinitionRequest();
+        registerTaskDefinitionRequest.setNetworkMode(NetworkMode.Host);
+        registerTaskDefinitionRequest.setContainerDefinitions(Arrays.asList(containerDefinition));
+        registerTaskDefinitionRequest.setFamily(modelTrainingRequest.getName());
+
+        final RegisterTaskDefinitionResult registerTaskDefinitionResult = ecs.registerTaskDefinition(registerTaskDefinitionRequest);
+
+        // ----
+
+        final DeploymentController deploymentController = new DeploymentController();
+        deploymentController.setType("ECS");
+
+        final CreateServiceRequest createServiceRequest = new CreateServiceRequest();
+        createServiceRequest.setServiceName(modelId);
+        createServiceRequest.setCluster(ECS_CLUSTER_NAME);
+        createServiceRequest.setDesiredCount(1);
+        createServiceRequest.setTaskDefinition(modelTrainingRequest.getName());
+        createServiceRequest.setDeploymentController(deploymentController);
+
+        final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);
+
+        // --
+
+        sqs.deleteMessage(queueUrl, message.getReceiptHandle());
+
+        // How many models are currently being trained?
+
+      /*final ListTasksRequest listTasksRequest = new ListTasksRequest();
       listTasksRequest.setCluster(ECS_CLUSTER_NAME);
       listTasksRequest.setServiceName(NLP_SERVING_SERVICE);
 
@@ -61,22 +118,24 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         // Start a new task.
         logger.log("Starting a new model training task.");
 
-        final CreateTaskSetRequest createTaskSetRequest = new CreateTaskSetRequest();
-        createTaskSetRequest.setCluster(ECS_CLUSTER_NAME);
-        createTaskSetRequest.setService(NLP_SERVING_SERVICE);
-        ecs.createTaskSet(createTaskSetRequest);
+        final CreateServiceRequest createServiceRequest = new CreateServiceRequest();
+        createServiceRequest.setServiceName();
+
+        ecs.runTask()
 
         // Delete the message from the queue.
         sqs.deleteMessage(queueUrl, message.getReceiptHandle());
 
+      }*/
+
       }
 
-    }
+      //logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
+      //logger.log("CONTEXT: " + gson.toJson(context));
+      //logger.log("EVENT: " + gson.toJson(event));
+      //logger.log("EVENT TYPE: " + event.getClass().toString());
 
-    //logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
-    //logger.log("CONTEXT: " + gson.toJson(context));
-    //logger.log("EVENT: " + gson.toJson(event));
-    //logger.log("EVENT TYPE: " + event.getClass().toString());
+    }
 
     return "done";
 
