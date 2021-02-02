@@ -66,18 +66,15 @@ This step creates:
 
 * An SQS queue that holds the model training definitions (the models we want to train).
 * An ECS cluster on which the model training and model serving containers will be run.
+* An EventsBridge rule to trigger the Lambda function.
+* A Lambda function that consumes from the SQS queue and initiates model training by creating the ECS service and task.
 * An S3 bucket that will contain the trained models and their associated files.
-* A Lambda function that consumes from the SQS queue and initiates model training.
 
-To delete the resources and clean up:
-
-```
-terraform destroy
-```
+To delete the resources and clean up run `terraform destroy`. Note that if you have any model trainings in progress when trying to delete the delete will hang. This is because the ECS services and tasks for the model training were not created by Terraform. Just manually delete those services and tasks first and the destory will succeed.
 
 #### Lambda Function
 
-The Lambda function is deployed via the Terraform scripts. It is a Java 11 function that is triggered when a message is published to the SQS queue.
+The Lambda function is deployed via the Terraform scripts. It is a Java 11 function that is triggered by an Amazon EventBridge (CloudWatch Events) Rule. The function consumes messages from the SQS queue. The function is parameterized through environment variables set by the terraform script.
 
 ### Training a Model
 
