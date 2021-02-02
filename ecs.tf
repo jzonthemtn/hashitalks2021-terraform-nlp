@@ -133,20 +133,36 @@ resource "aws_ecs_cluster" "ecs_cluster" {
 
 # ===
 
-data "template_file" "task_definition_template" {
-  template = file("${path.module}/task_definition.json.tpl")
+data "template_file" "task_definition_serving_template" {
+  template = file("${path.module}/serving_task_definition.json.tpl")
 }
 
-resource "aws_ecs_task_definition" "task_definition" {
+resource "aws_ecs_task_definition" "serving_task_definition" {
   family                = "worker"
-  container_definitions = data.template_file.task_definition_template.rendered
+  container_definitions = data.template_file.task_definition_serving_template.rendered
 }
-
-# ===
 
 resource "aws_ecs_service" "serving" {
   name            = "serving"
   cluster         = aws_ecs_cluster.ecs_cluster.id
-  task_definition = aws_ecs_task_definition.task_definition.arn
+  task_definition = aws_ecs_task_definition.serving_task_definition.arn
+  desired_count   = 1
+}
+
+# ===
+
+data "template_file" "task_definition_training_template" {
+  template = file("${path.module}/training_task_definition.json.tpl")
+}
+
+resource "aws_ecs_task_definition" "training_task_definition" {
+  family                = "worker"
+  container_definitions = data.template_file.task_definition_training_template.rendered
+}
+
+resource "aws_ecs_service" "serving" {
+  name            = "training"
+  cluster         = aws_ecs_cluster.ecs_cluster.id
+  task_definition = aws_ecs_task_definition.training_task_definition.arn
   desired_count   = 1
 }
