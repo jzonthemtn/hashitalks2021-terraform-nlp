@@ -95,7 +95,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
       {
          "Effect":"Allow",
          "Action":["sqs:*"],
-         "Resource":"arn:aws:sqs::${aws_sqs_queue.ml_queue.arn}"
+         "Resource":"${aws_sqs_queue.ml_queue.arn}"
       },
       {
          "Effect":"Allow",
