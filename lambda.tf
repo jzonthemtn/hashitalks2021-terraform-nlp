@@ -35,10 +35,14 @@ resource "aws_lambda_function" "aws_lambda_test" {
   memory_size = 256
   role        = aws_iam_role.iam_role_for_lambda.arn
   depends_on  = [aws_cloudwatch_log_group.log_group]
-
+  environment {
+    variables = {
+      s3_bucket = aws_s3_bucket.ml_bucket.id
+      aws_logs_group = aws_cloudwatch_log_group.nlp-training.name
+    }
+  }
 }
 
-# lambda role
 resource "aws_iam_role" "iam_role_for_lambda" {
   name               = "lambda-invoke-role"
   assume_role_policy = <<EOF

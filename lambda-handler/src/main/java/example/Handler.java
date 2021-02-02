@@ -60,17 +60,20 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
         // See https://aws.amazon.com/blogs/compute/centralized-container-logs-with-amazon-ecs-and-amazon-cloudwatch-logs/
         final Map<String, String> options = new LinkedHashMap<>();
-        options.put("awslogs-group", "nlp-training");
+        options.put("awslogs-group", System.getenv("aws_logs_group"));
         options.put("awslogs-region", Regions.US_EAST_1.getName());
         options.put("awslogs-stream-prefix", modelId);
         logConfiguration.setOptions(options);
         containerDefinition.setLogConfiguration(logConfiguration);
 
+        final String s3Bucket = System.getenv("s3_bucket");
+        logger.log("Using s3 bucket " + s3Bucket);
+
         final Collection<KeyValuePair> environmentVariables = new LinkedList<>();
         environmentVariables.add(new KeyValuePair().withName("MODEL").withValue(modelTrainingRequest.getName()));
-        environmentVariables.add(new KeyValuePair().withName("EPOCHS").withValue("1"));
-        environmentVariables.add(new KeyValuePair().withName("EMBEDDINGS").withValue("distilbert-base-cased"));
-        environmentVariables.add(new KeyValuePair().withName("S3_BUCKET").withValue("mtnfog-temp"));
+        environmentVariables.add(new KeyValuePair().withName("EPOCHS").withValue(String.valueOf(modelTrainingRequest.getEpochs())));
+        environmentVariables.add(new KeyValuePair().withName("EMBEDDINGS").withValue(modelTrainingRequest.getEmbeddings()));
+        environmentVariables.add(new KeyValuePair().withName("S3_BUCKET").withValue(s3Bucket));
         containerDefinition.setEnvironment(environmentVariables);
 
         /*PortMapping portMapping = new PortMapping();
@@ -98,9 +101,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         createServiceRequest.setDeploymentController(deploymentController);
 
         final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);
-
-        // --
-
+        
         sqs.deleteMessage(queueUrl, message.getReceiptHandle());
 
         // How many models are currently being trained?
