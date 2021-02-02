@@ -14,6 +14,7 @@ import com.amazonaws.services.sqs.model.Message;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import example.model.ModelTrainingRequest;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.*;
 
@@ -34,6 +35,9 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
     final String region = System.getenv("region");
     logger.log("Using region " + region);
+
+    final String debug = System.getenv("debug");
+    logger.log("Using debug " + debug);
 
     final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(region).build();
     final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(region).build();
@@ -90,7 +94,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         registerTaskDefinitionRequest.setContainerDefinitions(Arrays.asList(containerDefinition));
         registerTaskDefinitionRequest.setFamily(modelTrainingRequest.getName());
 
-        final RegisterTaskDefinitionResult registerTaskDefinitionResult = ecs.registerTaskDefinition(registerTaskDefinitionRequest);
+        ecs.registerTaskDefinition(registerTaskDefinitionRequest);
 
         final DeploymentController deploymentController = new DeploymentController();
         deploymentController.setType("ECS");
@@ -104,14 +108,18 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
         final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);
 
-        sqs.deleteMessage(queueUrl, message.getReceiptHandle());
+        if(StringUtils.isNotEmpty(createServiceResult.getService().getServiceArn())) {
+          sqs.deleteMessage(queueUrl, message.getReceiptHandle());
+        }
 
       }
 
-      //logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
-      //logger.log("CONTEXT: " + gson.toJson(context));
-      //logger.log("EVENT: " + gson.toJson(event));
-      //logger.log("EVENT TYPE: " + event.getClass().toString());
+      if(StringUtils.equalsIgnoreCase(debug, "true")) {
+        logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
+        logger.log("CONTEXT: " + gson.toJson(context));
+        logger.log("EVENT: " + gson.toJson(event));
+        logger.log("EVENT TYPE: " + event.getClass().toString());
+      }
 
     }
 

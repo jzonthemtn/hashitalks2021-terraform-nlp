@@ -41,8 +41,9 @@ resource "aws_lambda_function" "aws_lambda_test" {
       queue_url        = aws_sqs_queue.ml_queue.id
       ecs_cluster_name = var.cluster_name
       region           = data.aws_region.current.name
-      max_tasks        = 1
+      max_tasks        = "1"
       training_image   = "jzemerick/ner-training:latest"
+      debug            = "false"
     }
   }
 }
