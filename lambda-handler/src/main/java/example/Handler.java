@@ -47,7 +47,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         final ModelTrainingRequest modelTrainingRequest = gson.fromJson(message.getBody(), ModelTrainingRequest.class);
         final String modelId = modelTrainingRequest.getName() + "-" + UUID.randomUUID().toString();
 
-        logger.log("Received training request for model " + modelTrainingRequest.getName() + "(" + modelId + ")");
+        logger.log("Received training request for model " + modelTrainingRequest.getName() + " (" + modelId + ")");
 
         final ContainerDefinition containerDefinition = new ContainerDefinition();
         containerDefinition.setName(modelTrainingRequest.getName());
@@ -58,6 +58,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         final LogConfiguration logConfiguration = new LogConfiguration();
         logConfiguration.setLogDriver("awslogs");
 
+        // See https://aws.amazon.com/blogs/compute/centralized-container-logs-with-amazon-ecs-and-amazon-cloudwatch-logs/
         final Map<String, String> options = new LinkedHashMap<>();
         options.put("awslogs-group", "nlp-training");
         options.put("awslogs-region", Regions.US_EAST_1.getName());
