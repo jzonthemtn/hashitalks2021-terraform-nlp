@@ -160,7 +160,7 @@ resource "aws_ecs_task_definition" "training_task_definition" {
   container_definitions = data.template_file.task_definition_training_template.rendered
 }
 
-resource "aws_ecs_service" "serving" {
+resource "aws_ecs_service" "training" {
   name            = "training"
   cluster         = aws_ecs_cluster.ecs_cluster.id
   task_definition = aws_ecs_task_definition.training_task_definition.arn
