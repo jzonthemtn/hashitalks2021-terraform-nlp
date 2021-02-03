@@ -1,4 +1,4 @@
-# ML Models from Training to Serving: A Terraform Journey
+# From Training to Serving: Machine Learning Models with Terraform
 
 This repository contains the code for the [HashiTalks 2021](https://events.hashicorp.com/hashitalks2021) presentation.
 
