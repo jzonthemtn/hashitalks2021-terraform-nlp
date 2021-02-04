@@ -1,10 +1,9 @@
 resource "aws_security_group" "ml_vpc_security_group" {
-  vpc_id      = aws_vpc.ml_vpc.id
-  name        = "ml-sg"
-  description = "ml-sg"
+  vpc_id = aws_vpc.ml_vpc.id
+  name   = "${var.name_prefix}-sg"
 
   ingress {
-    cidr_blocks = var.ingressCIDRblock
+    cidr_blocks = var.ingress_cidr_block
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -28,13 +27,13 @@ resource "aws_internet_gateway" "ml_vpc_gw" {
 resource "aws_route_table" "ml_vpc_route_table" {
   vpc_id = aws_vpc.ml_vpc.id
   tags = {
-    Name = "ml-route-table"
+    Name = "${var.name_prefix}-route-table"
   }
 }
 
 resource "aws_route" "ml_vpc_internet_access" {
   route_table_id         = aws_route_table.ml_vpc_route_table.id
-  destination_cidr_block = var.destinationCIDRblock
+  destination_cidr_block = var.destination_cidr_block
   gateway_id             = aws_internet_gateway.ml_vpc_gw.id
 }
 
@@ -42,13 +41,6 @@ resource "aws_route_table_association" "ml_vpc_association" {
   subnet_id      = aws_subnet.ml_vpc_subnet.id
   route_table_id = aws_route_table.ml_vpc_route_table.id
 }
-
-#resource "aws_lambda_event_source_mapping" "example" {
-#  event_source_arn = aws_sqs_queue.sqs_queue_test.arn
-#  function_name    = aws_lambda_function.example.arn
-#}
-
-# ===
 
 resource "aws_security_group" "ecs_sg" {
   vpc_id = aws_vpc.ml_vpc.id
@@ -75,8 +67,6 @@ resource "aws_security_group" "ecs_sg" {
   }
 }
 
-# =====
-
 data "aws_iam_policy_document" "ecs_agent" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -89,7 +79,7 @@ data "aws_iam_policy_document" "ecs_agent" {
 }
 
 resource "aws_iam_role" "ecs_agent" {
-  name               = "ecs-agent"
+  name               = "${var.name_prefix}-ecs-agent"
   assume_role_policy = data.aws_iam_policy_document.ecs_agent.json
 }
 
@@ -99,34 +89,34 @@ resource "aws_iam_role_policy_attachment" "ecs_agent" {
 }
 
 resource "aws_iam_instance_profile" "ecs_agent" {
-  name = "ecs-agent"
+  name = "${var.name_prefix}-ecs-agent"
   role = aws_iam_role.ecs_agent.name
 }
-
-# ===
 
 resource "aws_launch_configuration" "ecs_launch_config" {
   image_id             = "ami-005b753c07ecef59f"
   iam_instance_profile = aws_iam_instance_profile.ecs_agent.name
   security_groups      = [aws_security_group.ecs_sg.id]
-  user_data            = "#!/bin/bash\necho ECS_CLUSTER=${var.cluster_name} >> /etc/ecs/ecs.config"
-  instance_type        = "c5.xlarge"
+  user_data            = "#!/bin/bash\necho ECS_CLUSTER=nlp-ner-ecs >> /etc/ecs/ecs.config"
+  instance_type        = var.ec2_instance_type
 }
 
 resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
-  name                 = "asg"
+  name                 = "${var.name_prefix}-ecs-asg"
   vpc_zone_identifier  = [aws_subnet.ml_vpc_subnet.id]
   launch_configuration = aws_launch_configuration.ecs_launch_config.name
 
-  desired_capacity          = 1
-  min_size                  = 1
-  max_size                  = 2
+  desired_capacity          = var.desired_capacity
+  min_size                  = var.min_cluster_size
+  max_size                  = var.max_cluster_size
   health_check_grace_period = 300
   health_check_type         = "EC2"
 }
 
-# ===
-
 resource "aws_ecs_cluster" "ecs_cluster" {
-  name = var.cluster_name
+  name = "${var.name_prefix}-ecs"
+}
+
+output "ecs_cluster_name" {
+  value = "${var.name_prefix}-ecs"
 }

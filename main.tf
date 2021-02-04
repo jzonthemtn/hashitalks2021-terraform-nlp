@@ -11,59 +11,30 @@ provider "aws" {
   region = var.region
 }
 
-data "aws_region" "current" {}
-
 resource "aws_vpc" "ml_vpc" {
-  cidr_block           = var.vpcCIDRblock
-  instance_tenancy     = var.instanceTenancy
-  enable_dns_support   = var.dnsSupport
-  enable_dns_hostnames = var.dnsHostNames
+  cidr_block           = var.vpc_cidr_block
+  enable_dns_hostnames = true
   tags = {
-    Name = "ml-vpc"
+    Name = "${var.name_prefix}-vpc"
   }
 }
 
 resource "aws_subnet" "ml_vpc_subnet" {
   vpc_id                  = aws_vpc.ml_vpc.id
-  cidr_block              = var.subnetCIDRblock
-  map_public_ip_on_launch = var.mapPublicIP
-  availability_zone       = var.availabilityZone
+  cidr_block              = var.subnet_1_cidr_block
+  map_public_ip_on_launch = true
+  availability_zone       = var.availability_zone_1
   tags = {
-    Name = "ml-subnet-1"
+    Name = "${var.name_prefix}-subnet-1"
   }
 }
 
 resource "aws_subnet" "ml_vpc_subnet_2" {
   vpc_id                  = aws_vpc.ml_vpc.id
-  cidr_block              = var.subnet2CIDRblock
-  map_public_ip_on_launch = var.mapPublicIP
-  availability_zone       = var.availabilityZone
+  cidr_block              = var.subnet_2_cidr_block
+  map_public_ip_on_launch = true
+  availability_zone       = var.availability_zone_1
   tags = {
-    Name = "ml-subnet-2"
+    Name = "${var.name_prefix}-subnet-2"
   }
-}
-
-resource "aws_sqs_queue" "ml_queue" {
-  name                       = "ml-queue"
-  delay_seconds              = 10
-  max_message_size           = 2048
-  message_retention_seconds  = 1209600
-  receive_wait_time_seconds  = 10
-  visibility_timeout_seconds = 60
-}
-
-output "queue_url" {
-  value = aws_sqs_queue.ml_queue.id
-}
-
-resource "aws_s3_bucket" "ml_bucket" {
-  acl = "private"
-}
-
-output "s3_bucket" {
-  value = aws_s3_bucket.ml_bucket.id
-}
-
-output "ecs_cluster_name" {
-  value = var.cluster_name
 }

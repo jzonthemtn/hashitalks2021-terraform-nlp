@@ -1,68 +1,47 @@
+variable "name_prefix" {
+  default = "nlp-ner"
+}
+
 variable "region" {
   default = "us-east-1"
 }
 
-variable "cluster_name" {
-  default = "nlp"
-}
-
-variable "availabilityZone" {
+variable "availability_zone_1" {
   default = "us-east-1a"
 }
 
-variable "instanceTenancy" {
-  default = "default"
-}
-
-variable "dnsSupport" {
-  default = true
-}
-
-variable "dnsHostNames" {
-  default = true
-}
-
-variable "vpcCIDRblock" {
+variable "vpc_cidr_block" {
   default = "10.0.0.0/16"
 }
 
-variable "subnetCIDRblock" {
+variable "subnet_1_cidr_block" {
   default = "10.0.1.0/24"
 }
 
-variable "subnet2CIDRblock" {
+variable "subnet_2_cidr_block" {
   default = "10.0.2.0/24"
 }
 
-variable "destinationCIDRblock" {
+variable "destination_cidr_block" {
   default = "0.0.0.0/0"
 }
 
-variable "ingressCIDRblock" {
+variable "ingress_cidr_block" {
   type    = list(any)
   default = ["0.0.0.0/0"]
 }
 
-variable "egressCIDRblock" {
-  type    = list(any)
-  default = ["0.0.0.0/0"]
+variable "ec2_instance_type" {
+  description = "ECS cluster instance type"
+  default     = "c5.xlarge"
 }
 
-variable "mapPublicIP" {
-  default = true
-}
-
-variable "ecs_cluster" {
-  description = "ECS cluster name"
-  default     = "nlp-ecs"
-}
-
-variable "max_instance_size" {
+variable "max_cluster_size" {
   description = "Maximum number of instances in the cluster"
   default     = 1
 }
 
-variable "min_instance_size" {
+variable "min_cluster_size" {
   description = "Minimum number of instances in the cluster"
   default     = 1
 }
@@ -70,4 +49,13 @@ variable "min_instance_size" {
 variable "desired_capacity" {
   description = "Desired number of instances in the cluster"
   default     = 1
+}
+
+variable "docker_training_image" {
+  description = "The training Docker image"
+  default     = "jzemerick/ner-training:latest"
+}
+
+variable "lambda_payload_filename" {
+  default = "lambda-handler/target/java-events-1.0-SNAPSHOT.jar"
 }
