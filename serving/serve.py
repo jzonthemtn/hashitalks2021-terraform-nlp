@@ -22,9 +22,15 @@ def obj_dict(obj):
     return obj.__dict__
 
 
+# The bucket that contains the mode.
 bucket = os.environ.get('MODEL_BUCKET')
+
+# The model S3 key.
+key = os.environ.get('MODEL_KEY')
+
+# Download the model.
 s3 = boto3.resource('s3')
-s3.Bucket(bucket).download_file('final-model.pt', '/tmp/final-model.pt')
+s3.Bucket(bucket).download_file(key, '/tmp/final-model.pt')
 
 model = SequenceTagger.load('/tmp/final-model.pt')
 

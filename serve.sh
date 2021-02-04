@@ -4,13 +4,40 @@ set -e
 MODEL=${1:-"my-model"}
 
 CLUSTER_NAME=`terraform output -raw ecs_cluster_name`
-S3_BUCKET=`terraform output -raw s3_bucket`
-S3_URL="s3://${S3_BUCKET}/${MODEL}/"
+MODEL_BUCKET=`terraform output -raw s3_bucket`
+MODEL_KEY="${MODEL}/final-model.pt"
+
+CONTAINER_DEFINITION="
+[{
+  \"name\": \"nlp-serving\",
+  \"image\": \"jzemerick/nlp-serving:latest\",
+  \"portMappings\": [{
+    \"containerPort\": 8080,
+    \"hostPort\": 8080,
+    \"protocol\": \"tcp\"
+  }],
+  \"essential\": true,
+  \"memory\": 4096,
+  \"command\": [
+    \"/bin/sh -c 'python3 /tmp/serve.py'\"
+  ],
+  \"environment\": [
+    {
+      \"name\": \"MODEL_BUCKET\",
+      \"value\": \"${MODEL_BUCKET}\"
+    },
+    {
+      \"name\": \"MODEL_BUCKET\",
+      \"value\": \"${MODEL_KEY}\"
+    }
+  ]
+}]
+"
 
 # Create a task definition.
 aws ecs register-task-definition \
   --family serving-${MODEL} \
-  --container-definitions "[{\"name\":\"nlp-serving\",\"image\":\"jzemerick/nlp-serving:latest\",\"cpu\":1,\"command\":[\"sleep\",\"360\"],\"memory\":4096,\"essential\":true}]"
+  --container-definitions "$CONTAINER_DEFINITION"
 
 # Create a service.
 aws ecs create-service \

@@ -6,7 +6,6 @@ FROM nvidia/cuda:11.1-devel-ubi8
 
 ARG FLAIR_VERSION
 
-LABEL maintainer="jeff.zemerick@mtnfog.com"
 LABEL flair="${FLAIR_VERSION}"
 LABEL python="3.8"
 
