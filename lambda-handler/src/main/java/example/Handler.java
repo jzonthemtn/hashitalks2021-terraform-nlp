@@ -51,7 +51,6 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
     } else {
 
       final int maxTasks = Integer.valueOf(System.getenv("max_tasks"));
-      final String trainingImage = System.getenv("training_image");
 
       for (final Message message : messages) {
 
@@ -66,7 +65,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         containerDefinition.setName(modelTrainingRequest.getName());
         containerDefinition.setMemoryReservation(100);
         containerDefinition.setMemory(4096);
-        containerDefinition.setImage(trainingImage);
+        containerDefinition.setImage(modelTrainingRequest.getImage());
 
         final LogConfiguration logConfiguration = new LogConfiguration();
         logConfiguration.setLogDriver("awslogs");

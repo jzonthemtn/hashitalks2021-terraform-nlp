@@ -16,7 +16,6 @@ resource "aws_lambda_function" "aws_lambda_test" {
       ecs_cluster_name = "${var.name_prefix}-ecs"
       region           = var.region
       max_tasks        = "1"
-      training_image   = var.docker_training_image
       debug            = "false"
     }
   }

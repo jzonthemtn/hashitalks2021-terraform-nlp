@@ -4,7 +4,8 @@ public class ModelTrainingRequest {
 
     private String name;
     private int epochs = 1;
-    private String embeddings = "distilbert-base-cased";
+    private String embeddings;
+    private String image;
 
     public String getName() {
         return name;
@@ -30,4 +31,11 @@ public class ModelTrainingRequest {
         this.embeddings = embeddings;
     }
 
+    public String getImage() {
+        return image;
+    }
+
+    public void setImage(String image) {
+        this.image = image;
+    }
 }

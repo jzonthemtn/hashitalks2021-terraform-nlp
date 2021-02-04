@@ -51,11 +51,6 @@ variable "desired_capacity" {
   default     = 1
 }
 
-variable "docker_training_image" {
-  description = "The training Docker image"
-  default     = "jzemerick/ner-training:latest"
-}
-
 variable "lambda_payload_filename" {
   default = "lambda-handler/target/java-events-1.0-SNAPSHOT.jar"
 }
