@@ -33,7 +33,7 @@ resource "aws_subnet" "ml_vpc_subnet_2" {
   vpc_id                  = aws_vpc.ml_vpc.id
   cidr_block              = var.subnet_2_cidr_block
   map_public_ip_on_launch = true
-  availability_zone       = var.availability_zone_1
+  availability_zone       = var.availability_zone_2
   tags = {
     Name = "${var.name_prefix}-subnet-2"
   }

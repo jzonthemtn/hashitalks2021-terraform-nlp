@@ -182,7 +182,3 @@ resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${var.name_prefix}-ecs"
 }
-
-output "ecs_cluster_name" {
-  value = "${var.name_prefix}-ecs"
-}

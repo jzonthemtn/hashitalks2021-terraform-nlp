@@ -48,6 +48,8 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
     final String taskRoleArn = System.getenv("task_role_arn");
     logger.log("Using task role arn " + taskRoleArn);
 
+    final int maxTasks = Integer.valueOf(System.getenv("max_tasks"));
+
     final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(region).build();
     final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(region).build();
     final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
@@ -59,8 +61,6 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
       logger.log("No messages were consumed.");
 
     } else {
-
-      final int maxTasks = Integer.valueOf(System.getenv("max_tasks"));
 
       for (final Message message : messages) {
 
