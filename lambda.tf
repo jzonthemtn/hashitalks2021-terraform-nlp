@@ -18,6 +18,7 @@ resource "aws_lambda_function" "aws_lambda_test" {
       max_tasks        = "1"
       debug            = "false"
       table_name       = aws_dynamodb_table.models_dynamodb_table.id
+      task_role_arn    = aws_iam_role.task_role.arn
     }
   }
 }
@@ -74,45 +75,6 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
          "Effect":"Allow",
          "Action":["sqs:*"],
          "Resource":"${aws_sqs_queue.queue.arn}"
-      },
-      {
-         "Effect":"Allow",
-         "Action":["s3:ListBucket"],
-         "Resource":"arn:aws:s3:::${aws_s3_bucket.bucket.id}"
-      },
-      {
-         "Effect":"Allow",
-         "Action":["s3:PutObject"],
-         "Resource":"arn:aws:s3:::${aws_s3_bucket.bucket.id}/*"
-      },
-      {
-          "Sid": "ListAndDescribe",
-          "Effect": "Allow",
-          "Action": [
-              "dynamodb:List*",
-              "dynamodb:DescribeReservedCapacity*",
-              "dynamodb:DescribeLimits",
-              "dynamodb:DescribeTimeToLive"
-          ],
-          "Resource": "*"
-      },
-      {
-          "Sid": "SpecificTable",
-          "Effect": "Allow",
-          "Action": [
-              "dynamodb:BatchGet*",
-              "dynamodb:DescribeStream",
-              "dynamodb:DescribeTable",
-              "dynamodb:Get*",
-              "dynamodb:Query",
-              "dynamodb:Scan",
-              "dynamodb:BatchWrite*",
-              "dynamodb:CreateTable",
-              "dynamodb:Delete*",
-              "dynamodb:Update*",
-              "dynamodb:PutItem"
-          ],
-          "Resource": "${aws_dynamodb_table.models_dynamodb_table.arn}"
       }
     ]
   }

@@ -78,6 +78,48 @@ data "aws_iam_policy_document" "ecs_agent" {
   }
 }
 
+resource "aws_iam_role" "task_role" {
+  name = "${var.name_prefix}-task-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+       "Effect":"Allow",
+       "Action":["s3:ListBucket"],
+       "Resource":"arn:aws:s3:::${aws_s3_bucket.bucket.id}"
+    },
+    {
+       "Effect":"Allow",
+       "Action":["s3:PutObject"],
+       "Resource":"arn:aws:s3:::${aws_s3_bucket.bucket.id}/*"
+    },
+    {
+        "Sid": "ListAndDescribe",
+        "Effect": "Allow",
+        "Action": [
+            "dynamodb:List*",
+            "dynamodb:DescribeReservedCapacity*",
+            "dynamodb:DescribeLimits",
+            "dynamodb:DescribeTimeToLive"
+        ],
+        "Resource": "*"
+    },
+    {
+        "Sid": "SpecificTable",
+        "Effect": "Allow",
+        "Action": [
+            "dynamodb:*"
+        ],
+        "Resource": "${aws_dynamodb_table.models_dynamodb_table.arn}"
+    }
+  ]
+}
+EOF
+
+}
+
 resource "aws_iam_role" "ecs_agent" {
   name               = "${var.name_prefix}-ecs-agent"
   assume_role_policy = data.aws_iam_policy_document.ecs_agent.json

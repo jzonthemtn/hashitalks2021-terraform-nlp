@@ -45,6 +45,9 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
     final String tableName = System.getenv("table_name");
     logger.log("Using table name " + tableName);
 
+    final String taskRoleArn = System.getenv("task_role_arn");
+    logger.log("Using task role arn " + taskRoleArn);
+
     final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(region).build();
     final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(region).build();
     final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
@@ -102,6 +105,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         registerTaskDefinitionRequest.setNetworkMode(NetworkMode.Host);
         registerTaskDefinitionRequest.setContainerDefinitions(Arrays.asList(containerDefinition));
         registerTaskDefinitionRequest.setFamily(modelTrainingRequest.getName());
+        registerTaskDefinitionRequest.setTaskRoleArn(taskRoleArn);
 
         ecs.registerTaskDefinition(registerTaskDefinitionRequest);
 
@@ -142,6 +146,8 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         }
 
       }
+
+      // TODO: Go through the DynamoDB items. Any "Complete" should have their task/service deleted.
 
       if(StringUtils.equalsIgnoreCase(debug, "true")) {
         logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
