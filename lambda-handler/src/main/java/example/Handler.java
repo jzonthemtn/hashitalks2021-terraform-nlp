@@ -120,6 +120,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
           itemValues.put("ModelID", new AttributeValue(modelId));
           itemValues.put("Image", new AttributeValue(modelTrainingRequest.getImage()));
           itemValues.put("StartTime", new AttributeValue(String.valueOf(System.currentTimeMillis())));
+          itemValues.put("Status", new AttributeValue("In Progress"));
 
           try {
 
