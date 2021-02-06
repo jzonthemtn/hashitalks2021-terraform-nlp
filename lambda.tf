@@ -112,7 +112,7 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
               "dynamodb:Update*",
               "dynamodb:PutItem"
           ],
-          "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.models_dynamodb_table.id}"
+          "Resource": "${aws_dynamodb_table.models_dynamodb_table.arn}"
       }
     ]
   }
