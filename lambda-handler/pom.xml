@@ -8,6 +8,7 @@
   <name>java-events-function</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <aws.sdk.version>1.11.949</aws.sdk.version>
   </properties>
   <build>
     <plugins>
@@ -45,12 +46,17 @@
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-sqs</artifactId>
-      <version>1.11.946</version>
+      <version>${aws.sdk.version}</version>
     </dependency>
     <dependency>
       <groupId>com.amazonaws</groupId>
       <artifactId>aws-java-sdk-ecs</artifactId>
-      <version>1.11.946</version>
+      <version>${aws.sdk.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.amazonaws</groupId>
+      <artifactId>aws-java-sdk-dynamodb</artifactId>
+      <version>${aws.sdk.version}</version>
     </dependency>
     <dependency>
       <groupId>com.amazonaws</groupId>

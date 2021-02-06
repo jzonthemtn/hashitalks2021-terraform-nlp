@@ -1,6 +1,9 @@
 package example;
 
 import com.amazonaws.regions.Regions;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSClientBuilder;
 import com.amazonaws.services.ecs.model.*;
@@ -39,8 +42,12 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
     final String debug = System.getenv("debug");
     logger.log("Using debug " + debug);
 
+    final String tableName = System.getenv("table_name");
+    logger.log("Using table name " + tableName);
+
     final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(region).build();
     final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(region).build();
+    final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
 
     final List<Message> messages = sqs.receiveMessage(queueUrl).getMessages();
 
@@ -108,7 +115,26 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);
 
         if(StringUtils.isNotEmpty(createServiceResult.getService().getServiceArn())) {
-          sqs.deleteMessage(queueUrl, message.getReceiptHandle());
+
+          final HashMap<String, AttributeValue> itemValues = new HashMap<>();
+          itemValues.put("ModelID", new AttributeValue(modelId));
+          itemValues.put("Image", new AttributeValue(modelTrainingRequest.getImage()));
+          itemValues.put("StartTime", new AttributeValue(String.valueOf(System.currentTimeMillis())));
+
+          try {
+
+            // Store in the table.
+            ddb.putItem(tableName, itemValues);
+
+            // Delete this message from the queue.
+            sqs.deleteMessage(queueUrl, message.getReceiptHandle());
+
+          } catch (Exception ex) {
+
+            System.err.println(ex.getMessage());
+
+          }
+
         }
 
       }

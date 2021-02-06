@@ -17,6 +17,7 @@ resource "aws_lambda_function" "aws_lambda_test" {
       region           = var.region
       max_tasks        = "1"
       debug            = "false"
+      table_name       = aws_dynamodb_table.models_dynamodb_table.id
     }
   }
 }
@@ -83,13 +84,41 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
          "Effect":"Allow",
          "Action":["s3:PutObject"],
          "Resource":"arn:aws:s3:::${aws_s3_bucket.bucket.id}/*"
+      },
+      {
+          "Sid": "ListAndDescribe",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:List*",
+              "dynamodb:DescribeReservedCapacity*",
+              "dynamodb:DescribeLimits",
+              "dynamodb:DescribeTimeToLive"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Sid": "SpecificTable",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:BatchGet*",
+              "dynamodb:DescribeStream",
+              "dynamodb:DescribeTable",
+              "dynamodb:Get*",
+              "dynamodb:Query",
+              "dynamodb:Scan",
+              "dynamodb:BatchWrite*",
+              "dynamodb:CreateTable",
+              "dynamodb:Delete*",
+              "dynamodb:Update*",
+              "dynamodb:PutItem"
+          ],
+          "Resource": "arn:aws:dynamodb:*:*:table/${aws_dynamodb_table.models_dynamodb_table.id}"
       }
     ]
   }
 EOF
 }
 
-# Attach the policy to the role
 resource "aws_iam_role_policy_attachment" "aws_iam_role_policy_attachment" {
   role       = aws_iam_role.iam_role_for_lambda.name
   policy_arn = aws_iam_policy.iam_policy_for_lambda.arn

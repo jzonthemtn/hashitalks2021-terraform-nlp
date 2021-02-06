@@ -55,7 +55,7 @@ mvn clean package -f ./lambda-handler/pom.xml -DskipTests=true
 
 ### Creating the infrastructure using Terraform
 
-With the Docker images built and pushed we can now create the infrastructure using Terraform.
+With the Docker images built and pushed we can now create the infrastructure using Terraform. In `variables.tf` there is a `name_prefix` variable that you can set in order to instantiate multiple copies of the infrastructure.
 
 ```
 terraform init
@@ -69,6 +69,7 @@ This step creates:
 * An EventsBridge rule to trigger the Lambda function.
 * A Lambda function that consumes from the SQS queue and initiates model training by creating the ECS service and task.
 * An S3 bucket that will contain the trained models and their associated files.
+* A DynamoDB table that will contain metadata about the models.
 
 To delete the resources and clean up run `terraform destroy`. Note that if you have any model trainings in progress when trying to delete the delete will hang. This is because the ECS services and tasks for the model training were not created by Terraform. Just manually delete those services and tasks first and the destory will succeed.
 
