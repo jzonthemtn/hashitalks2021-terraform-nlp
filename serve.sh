@@ -35,7 +35,7 @@ CONTAINER_DEFINITION="
       \"value\": \"${MODEL_BUCKET}\"
     },
     {
-      \"name\": \"MODEL_BUCKET\",
+      \"name\": \"MODEL_KEY\",
       \"value\": \"${MODEL_KEY}\"
     }
   ]
@@ -49,7 +49,7 @@ aws ecs register-task-definition \
 
 # Create a service.
 aws ecs create-service \
-  --service-name serving-${MODEL}-b \
+  --service-name serving-${MODEL}-d \
   --task-definition serving-${MODEL} \
   --desired-count 1 \
   --cluster $CLUSTER_NAME
