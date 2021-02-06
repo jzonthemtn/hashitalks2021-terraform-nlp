@@ -33,7 +33,7 @@ variable "ingress_cidr_block" {
 
 variable "ec2_instance_type" {
   description = "ECS cluster instance type"
-  default     = "c5.xlarge"
+  default     = "t3.large"
 }
 
 variable "max_cluster_size" {
