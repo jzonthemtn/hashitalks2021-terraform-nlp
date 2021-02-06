@@ -30,4 +30,4 @@ ENV TABLE_NAME=""
 
 ADD train.py /tmp/train.py
 
-CMD python3.8 /tmp/train.py --m ${MODEL} --e ${EPOCHS} --v ${EMBEDDINGS} --i ${MODEL_ID} --r ${REGION} --t ${TABLE_NAME} && aws s3 sync /tmp/$MODEL s3://${S3_BUCKET}/$MODEL/
+CMD python3.8 /tmp/train.py --m ${MODEL} --e ${EPOCHS} --v ${EMBEDDINGS} --i ${MODEL_ID} --r ${REGION} --t ${TABLE_NAME} && aws s3 sync /tmp/$MODEL/ s3://${S3_BUCKET}/$MODEL/

@@ -10,3 +10,13 @@ resource "aws_sqs_queue" "queue" {
 resource "aws_s3_bucket" "bucket" {
   acl = "private"
 }
+
+# Upload a sample model to S3 to illustrate serving without having to
+# spend time training a model.
+
+#resource "aws_s3_bucket_object" "object" {
+#  bucket = aws_s3_bucket.bucket.id
+#  key    = "models/my-model/final-model.pt"
+#  source = "my-model/final-model.pt"
+#  etag = filemd5("my-model/final-model.pt")
+#}

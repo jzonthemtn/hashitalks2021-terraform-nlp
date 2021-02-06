@@ -23,6 +23,21 @@ args = parser.parse_args()
 
 corpus: Corpus = WIKINER_ENGLISH().downsample(0.1)
 
+dynamodb = boto3.resource('dynamodb', region_name=args.region)
+
+table = dynamodb.Table(args.table)
+table.update_item(
+    Key={
+        'ModelID': args.model_id
+    },
+    UpdateExpression="set Progress=:s",
+    ExpressionAttributeValues={
+        ':s': 'In Progress'
+    },
+    ReturnValues="UPDATED_NEW"
+)
+
+
 tag_type = 'ner'
 tag_dictionary = corpus.make_tag_dictionary(tag_type=tag_type)
 embeddings = TransformerWordEmbeddings(model=args.embeddings)
@@ -35,7 +50,10 @@ tagger: SequenceTagger = SequenceTagger(hidden_size=256,
 
 trainer: ModelTrainer = ModelTrainer(tagger, corpus, use_tensorboard=True)
 
-trainer.train('./' + args.model,
+os.mkdir('/tmp/' + args.model)
+print('Saving model to ' + '/tmp/' + args.model)
+
+trainer.train('/tmp/' + args.model,
               learning_rate=0.1,
               mini_batch_size=32,
               max_epochs=int(args.epochs),
@@ -45,7 +63,7 @@ trainer.train('./' + args.model,
               shuffle=True,
               embeddings_storage_mode='cpu')
 
-dynamodb = boto3.resource('dynamodb', region_name=args.region)
+
 table = dynamodb.Table(args.table)
 table.update_item(
     Key={
