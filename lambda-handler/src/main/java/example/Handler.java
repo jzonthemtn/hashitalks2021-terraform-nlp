@@ -128,6 +128,9 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
           itemValues.put("Image", new AttributeValue(modelTrainingRequest.getImage()));
           itemValues.put("StartTime", new AttributeValue(String.valueOf(System.currentTimeMillis())));
           itemValues.put("Progress", new AttributeValue("In Progress"));
+          itemValues.put("ServiceName", new AttributeValue(createServiceResult.getService().getServiceName()));
+          itemValues.put("ServiceArn", new AttributeValue(createServiceResult.getService().getServiceArn()));
+          itemValues.put("TaskId", new AttributeValue(createServiceResult.getService().getTaskSets().get(0).getId()));
 
           try {
 
