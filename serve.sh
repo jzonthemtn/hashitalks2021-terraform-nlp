@@ -10,12 +10,20 @@ MODEL_KEY="${MODEL}/final-model.pt"
 CONTAINER_DEFINITION="
 [{
   \"name\": \"nlp-serving\",
-  \"image\": \"jzemerick/nlp-serving:latest\",
+  \"image\": \"jzemerick/ner-serving:latest\",
   \"portMappings\": [{
     \"containerPort\": 8080,
     \"hostPort\": 8080,
     \"protocol\": \"tcp\"
   }],
+  \"logConfiguration\": {
+    \"logDriver\": \"awslogs\",
+    \"options\": {
+        \"awslogs-group\": \"nlp-serving\",
+        \"awslogs-region\": \"us-east-1\",
+        \"awslogs-stream-prefix\": \"nlp-serving-${MODEL}\"
+    }
+},
   \"essential\": true,
   \"memory\": 4096,
   \"command\": [
@@ -41,7 +49,7 @@ aws ecs register-task-definition \
 
 # Create a service.
 aws ecs create-service \
-  --service-name serving-${MODEL} \
+  --service-name serving-${MODEL}-b \
   --task-definition serving-${MODEL} \
   --desired-count 1 \
   --cluster $CLUSTER_NAME
