@@ -20,3 +20,10 @@ resource "aws_s3_bucket" "bucket" {
 #  source = "my-model/final-model.pt"
 #  etag = filemd5("my-model/final-model.pt")
 #}
+
+#resource "aws_s3_bucket_object" "object" {
+#  bucket = aws_s3_bucket.bucket.id
+#  key    = "models/my-model/weights.txt"
+#  source = "my-model/weights.txt"
+#  etag = filemd5("my-model/weights.txt")
+#}

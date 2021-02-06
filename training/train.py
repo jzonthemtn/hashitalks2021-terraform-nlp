@@ -64,14 +64,13 @@ trainer.train('/tmp/' + args.model,
               embeddings_storage_mode='cpu')
 
 
-table = dynamodb.Table(args.table)
 table.update_item(
     Key={
         'ModelID': args.model_id
     },
     UpdateExpression="set Progress=:s",
     ExpressionAttributeValues={
-        ':s': 'Complete'
+        ':s': 'Completed'
     },
     ReturnValues="UPDATED_NEW"
 )
