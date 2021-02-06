@@ -87,7 +87,7 @@ This publishes a message to the SQS queue which describes a desired model traini
 
 ### Serving a Model
 
-To serve a model, run the `serve.sh` script giving it the name of the model to serve.
+To serve a model, run `serve.sh` giving it the name of the model to serve.
 
 `./serve.sh my-model`
 

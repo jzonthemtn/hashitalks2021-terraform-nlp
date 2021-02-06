@@ -94,6 +94,8 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         environmentVariables.add(new KeyValuePair().withName("EPOCHS").withValue(String.valueOf(modelTrainingRequest.getEpochs())));
         environmentVariables.add(new KeyValuePair().withName("EMBEDDINGS").withValue(modelTrainingRequest.getEmbeddings()));
         environmentVariables.add(new KeyValuePair().withName("S3_BUCKET").withValue(s3Bucket));
+        environmentVariables.add(new KeyValuePair().withName("TABLE_NAME").withValue(tableName));
+        environmentVariables.add(new KeyValuePair().withName("REGION").withValue(region));
         containerDefinition.setEnvironment(environmentVariables);
 
         final RegisterTaskDefinitionRequest registerTaskDefinitionRequest = new RegisterTaskDefinitionRequest();
@@ -121,7 +123,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
           itemValues.put("ModelID", new AttributeValue(modelId));
           itemValues.put("Image", new AttributeValue(modelTrainingRequest.getImage()));
           itemValues.put("StartTime", new AttributeValue(String.valueOf(System.currentTimeMillis())));
-          itemValues.put("Status", new AttributeValue("In Progress"));
+          itemValues.put("Progress", new AttributeValue("In Progress"));
 
           try {
 
