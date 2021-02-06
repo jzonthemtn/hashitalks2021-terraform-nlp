@@ -75,7 +75,32 @@ resource "aws_iam_policy" "iam_policy_for_lambda" {
          "Effect":"Allow",
          "Action":["sqs:*"],
          "Resource":"${aws_sqs_queue.queue.arn}"
-      }
+      },
+      {
+         "Sid": "PolicyStatementToAllowUserToPassOneSpecificRole",
+         "Effect": "Allow",
+         "Action": [ "iam:PassRole" ],
+         "Resource": "${aws_iam_role.task_role.arn}"
+      },
+      {
+          "Sid": "ListAndDescribe",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:List*",
+              "dynamodb:DescribeReservedCapacity*",
+              "dynamodb:DescribeLimits",
+              "dynamodb:DescribeTimeToLive"
+          ],
+          "Resource": "*"
+      },
+      {
+          "Sid": "SpecificTable",
+          "Effect": "Allow",
+          "Action": [
+              "dynamodb:*"
+          ],
+          "Resource": "${aws_dynamodb_table.models_dynamodb_table.arn}"
+      }      
     ]
   }
 EOF
