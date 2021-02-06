@@ -78,7 +78,7 @@ data "aws_iam_policy_document" "ecs_agent" {
   }
 }
 
-resource "aws_iam_policy" "policy" {
+resource "aws_iam_policy" "task_policy" {
   name        = "${var.name_prefix}-task-policy"
   description = "IAM policy for ECS tasks"
   policy      = <<EOF
@@ -137,7 +137,11 @@ resource "aws_iam_role" "task_role" {
   ]
 }
 EOF
+}
 
+resource "aws_iam_role_policy_attachment" "test-attach" {
+  role       = aws_iam_role.task_role.name
+  policy_arn = aws_iam_policy.task_policy.arn
 }
 
 resource "aws_iam_role" "ecs_agent" {
