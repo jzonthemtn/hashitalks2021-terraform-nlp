@@ -90,6 +90,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
         final Collection<KeyValuePair> environmentVariables = new LinkedList<>();
         environmentVariables.add(new KeyValuePair().withName("MODEL").withValue(modelTrainingRequest.getName()));
+        environmentVariables.add(new KeyValuePair().withName("MODEL_ID").withValue(modelId));
         environmentVariables.add(new KeyValuePair().withName("EPOCHS").withValue(String.valueOf(modelTrainingRequest.getEpochs())));
         environmentVariables.add(new KeyValuePair().withName("EMBEDDINGS").withValue(modelTrainingRequest.getEmbeddings()));
         environmentVariables.add(new KeyValuePair().withName("S3_BUCKET").withValue(s3Bucket));
