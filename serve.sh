@@ -27,7 +27,7 @@ CONTAINER_DEFINITION="
   \"essential\": true,
   \"memory\": 4096,
   \"command\": [
-    \"/bin/sh -c 'python3 /tmp/serve.py'\"
+    \"/bin/sh -c 'python3.8 /tmp/serve.py'\"
   ],
   \"environment\": [
     {
