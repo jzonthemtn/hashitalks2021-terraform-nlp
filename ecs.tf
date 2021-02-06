@@ -78,10 +78,10 @@ data "aws_iam_policy_document" "ecs_agent" {
   }
 }
 
-resource "aws_iam_role" "task_role" {
-  name = "${var.name_prefix}-task-role"
-
-  assume_role_policy = <<EOF
+resource "aws_iam_policy" "policy" {
+  name        = "${var.name_prefix}-task-policy"
+  description = "IAM policy for ECS tasks"
+  policy      = <<EOF
 {
   "Version": "2012-10-17",
   "Statement": [
@@ -113,6 +113,26 @@ resource "aws_iam_role" "task_role" {
             "dynamodb:*"
         ],
         "Resource": "${aws_dynamodb_table.models_dynamodb_table.arn}"
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role" "task_role" {
+  name = "${var.name_prefix}-task-role"
+
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "ecs-tasks.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
     }
   ]
 }
