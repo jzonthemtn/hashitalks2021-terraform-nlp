@@ -130,7 +130,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
           itemValues.put("Progress", new AttributeValue("Pending"));
           itemValues.put("ServiceName", new AttributeValue(createServiceResult.getService().getServiceName()));
           itemValues.put("ServiceArn", new AttributeValue(createServiceResult.getService().getServiceArn()));
-          itemValues.put("TaskId", new AttributeValue(createServiceResult.getService().getTaskSets().get(0).getId()));
+          //itemValues.put("TaskId", new AttributeValue(createServiceResult.getService().getTaskSets().get(0).getId()));
 
           try {
 
