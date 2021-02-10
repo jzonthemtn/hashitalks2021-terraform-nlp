@@ -16,11 +16,7 @@ Attendees of this talk will come away with a working knowledge of how a machine 
 
 ## Usage
 
-To get started first clone this repository.
-
-### Cost and Indemnity
-
-TODO: Should we add any estimated costs or just a blurb about the fact that there will be cost with running this code in AWS and that we're not responsible for any charges incurred?
+To get started first clone this repository. **Note that this project will create resources outside the AWS free tier.**
 
 ### Building the Containers
 
@@ -105,6 +101,14 @@ curl -X POST http://$HOSTNAME:8080/ner --data "George Washington was president o
 ```
 
 The response will be a JSON-encoded list of entities (`George Washington` and `United States`) from the text.
+
+## GPU
+
+For training and serving on a GPU:
+
+1. Modify the Dockerfiles to use the commented CUDA base image.
+1. Use a GPU-capable EC2 instance type for the ECS cluster.
+1. Install the appropriate CUDA runtime on the EC2 instance(s).
 
 ## License
 

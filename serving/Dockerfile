@@ -1,4 +1,9 @@
-FROM nvidia/cuda:11.1-devel-ubi8
+# The version of the base container must
+# match the driver installed on the local system.
+# Download the driver from: https://developer.nvidia.com/cuda-downloads
+#FROM nvidia/cuda:11.1-devel-ubi8
+
+FROM registry.access.redhat.com/ubi8:8.3
 
 RUN yum upgrade -y \
 	&& yum install -y python38 \
