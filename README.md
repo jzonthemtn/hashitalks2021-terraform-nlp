@@ -106,7 +106,6 @@ The response will be a JSON-encoded list of entities (`George Washington` and `U
 
 For training and serving on a GPU:
 
-1. Modify the Dockerfiles to use the commented CUDA base image.
 1. Use a GPU-capable EC2 instance type for the ECS cluster.
 1. Install the appropriate CUDA runtime on the EC2 instance(s).
 
