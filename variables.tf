@@ -58,3 +58,7 @@ variable "desired_capacity" {
 variable "lambda_payload_filename" {
   default = "lambda-handler/target/java-events-1.0-SNAPSHOT.jar"
 }
+
+variable "ttl_enable" {
+  default = false
+}

@@ -11,4 +11,4 @@ docker run \
   -p 8080:8080 \
   -it \
   --rm \
-  jzemerick/ner-serving:$VERSION
+  $DOCKERHUB_USERNAME/ner-serving:$VERSION

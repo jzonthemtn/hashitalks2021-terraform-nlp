@@ -13,7 +13,7 @@ MODEL_KEY="${MODEL}/final-model.pt"
 CONTAINER_DEFINITION="
 [{
   \"name\": \"nlp-serving\",
-  \"image\": \"jzemerick/ner-serving:latest\",
+  \"image\": \"$DOCKERHUB_USERNAME/ner-serving:latest\",
   \"portMappings\": [{
     \"containerPort\": 8080,
     \"hostPort\": 8080,
