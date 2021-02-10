@@ -13,6 +13,7 @@ RUN yum upgrade -y \
 	&& yum install -y python38 \
 	&& yum install -y python38-devel
 
+# Note: These RUN lines could be combined into a single RUN command to reduce layers
 RUN python3.8 -m pip install --upgrade pip
 RUN python3.8 -m pip install --upgrade setuptools wheel
 RUN python3.8 -m pip install flair==${FLAIR_VERSION}
@@ -28,6 +29,6 @@ ENV MODEL_ID=""
 ENV REGION="us-east-1"
 ENV TABLE_NAME=""
 
-ADD train.py /tmp/train.py
+COPY train.py /tmp/train.py
 
 CMD python3.8 /tmp/train.py --m ${MODEL} --e ${EPOCHS} --v ${EMBEDDINGS} --i ${MODEL_ID} --r ${REGION} --t ${TABLE_NAME} && aws s3 sync /tmp/$MODEL/ s3://${S3_BUCKET}/$MODEL/

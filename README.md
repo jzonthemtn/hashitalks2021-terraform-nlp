@@ -18,21 +18,26 @@ Attendees of this talk will come away with a working knowledge of how a machine 
 
 To get started first clone this repository.
 
+### Cost and Indemnity
+
+TODO: Should we add any estimated costs or just a blurb about the fact that there will be cost with running this code in AWS and that we're not responsible for any charges incurred?
+
 ### Building the Containers
 
 This project uses Docker containers for model training and serving. One container is used for training an NLP NER model and another container is used to serve a model via a simple REST API. Refer to each container's Dockerfile for details on the training and serving. The NLP is handled by [Flair](https://github.com/flairNLP/flair).
 
 **Important First Steps**
 
-* You will want to modify the `build-image.sh` scripts to use your DockerHub username instead of mine.
-* You also need to update the DockerHub username in the Terraform scripts regarding the image definitions.
+* You will need a DockerHub <hub.docker.com> account.
+* You will need to log the Docker CLI into your account `docker login`
+* Export your DockerHub username to the shell you'll be using `export DOCKERHUB_USERNAME=<your-user-name>`
 
 Now you can build and push the NLP NER training container:
 
 ```
 cd training
 ./build-image.sh
-docker push username/ner-training:latest
+docker push $DOCKERHUB_USERNAME/ner-training:latest
 ```
 
 Now build and push the serving container:
@@ -40,7 +45,7 @@ Now build and push the serving container:
 ```
 cd serving
 ./build-image.sh
-docker push username/ner-serve:latest
+docker push $DOCKERHUB_USERNAME/ner-serve:latest
 ```
 
 ### Building the Lambda Function
@@ -71,11 +76,11 @@ This step creates:
 * An S3 bucket that will contain the trained models and their associated files.
 * A DynamoDB table that will contain metadata about the models.
 
-To delete the resources and clean up run `terraform destroy`. Note that if you have any model trainings in progress when trying to delete the delete will hang. This is because the ECS services and tasks for the model training were not created by Terraform. Just manually delete those services and tasks first and the destory will succeed.
+To delete the resources and clean up run `terraform destroy`. Note that if you have any model trainings in progress when trying to delete the delete will hang. This is because the ECS services and tasks for the model training were not created by Terraform. Just manually delete those services and tasks first and the destroy will succeed.
 
 #### Lambda Function
 
-The Lambda function is deployed via the Terraform scripts. It is a Java 11 function that is triggered by an Amazon EventBridge (CloudWatch Events) Rule. The function consumes messages from the SQS queue. The function is parameterized through environment variables set by the terraform script.
+The Lambda function is deployed via Terraform. It is a Java 11 function that is triggered by an Amazon EventBridge (CloudWatch Events) Rule. The function consumes messages from the SQS queue. The function is parameterized through environment variables set by the terraform script.
 
 ### Training a Model
 

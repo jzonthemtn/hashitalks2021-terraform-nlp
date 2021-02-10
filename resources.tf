@@ -8,7 +8,8 @@ resource "aws_sqs_queue" "queue" {
 }
 
 resource "aws_s3_bucket" "bucket" {
-  acl = "private"
+  acl           = "private"
+  force_destroy = true
 }
 
 # Upload a sample model to S3 to illustrate serving without having to

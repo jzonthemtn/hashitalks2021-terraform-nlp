@@ -12,6 +12,6 @@ docker run \
     --env "EMBEDDINGS=distilbert-base-cased" \
     --env "S3_BUCKET=$S3_BUCKET" \
     --rm \
-    jzemerick/ner-training:$CONTAINER_VERSION
+    $DOCKERHUB_USERNAME/ner-training:$CONTAINER_VERSION
 
 # --runtime=nvidia \
