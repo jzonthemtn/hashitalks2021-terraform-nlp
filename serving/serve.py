@@ -68,7 +68,7 @@ class NerModelService(object):
         return s
 
     @cherrypy.expose
-    def status(self):
+    def health(self):
         return "healthy"
 
 
