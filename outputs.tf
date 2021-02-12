@@ -21,3 +21,15 @@ output "ecs_cluster_name" {
 output "task_role_arn" {
   value = aws_iam_role.task_role.arn
 }
+
+resource "aws_ssm_parameter" "param_ecs_cluster_name" {
+  name  = "${var.name_prefix}-ecs-cluster-name"
+  type  = "String"
+  value = "${var.name_prefix}-ecs"
+}
+
+resource "aws_ssm_parameter" "param_s3_bucket" {
+  name  = "${var.name_prefix}-s3-bucket"
+  type  = "String"
+  value = aws_s3_bucket.bucket.id
+}
