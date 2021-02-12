@@ -47,7 +47,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
     final String taskRoleArn = System.getenv("task_role_arn");
     logger.log("Using task role arn " + taskRoleArn);
-    
+
     final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(region).build();
     final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(region).build();
     final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
