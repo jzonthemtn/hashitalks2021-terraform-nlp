@@ -47,9 +47,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
     final String taskRoleArn = System.getenv("task_role_arn");
     logger.log("Using task role arn " + taskRoleArn);
-
-    final int maxTasks = Integer.valueOf(System.getenv("max_tasks"));
-
+    
     final AmazonECS ecs = AmazonECSClientBuilder.standard().withRegion(region).build();
     final AmazonSQS sqs = AmazonSQSClientBuilder.standard().withRegion(region).build();
     final AmazonDynamoDB ddb = AmazonDynamoDBClientBuilder.standard().withRegion(region).build();
@@ -68,8 +66,6 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         final String modelId = modelTrainingRequest.getName() + "-" + UUID.randomUUID().toString();
 
         logger.log("Received training request for model " + modelTrainingRequest.getName() + " (" + modelId + ")");
-
-        // TODO: Check to see if we are under the maximum.
 
         final ContainerDefinition containerDefinition = new ContainerDefinition();
         containerDefinition.setName(modelTrainingRequest.getName());
