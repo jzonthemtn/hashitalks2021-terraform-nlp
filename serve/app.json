@@ -1,0 +1,35 @@
+[{
+  "essential": true,
+  "image": "jzemerick/ner-serving:latest",
+  "memory": 4096,
+  "memoryReservation": 4096,
+  "name": "model-name",
+  "portMappings": [{
+    "containerPort": 8080,
+    "hostPort": 0
+  }],
+  "logConfiguration": {
+    "logDriver": "awslogs",
+    "options": {
+      "awslogs-group": "nlp-serving",
+      "awslogs-region": "us-east-1",
+      "awslogs-stream-prefix": "my-model"
+    }
+  },
+  "environment": [{
+      "name": "MODEL_BUCKET",
+      "value": "us-east-1"
+    },
+    {
+      "name": "MODEL_KEY",
+      "value": "fake-bucket"
+    }
+  ],
+  "healthCheck": {
+    "command": ["CMD-SHELL", "wget --quiet http://localhost:8080/health || exit 1"],
+    "retries": 3,
+    "timeout": 2,
+    "interval": 5,
+    "startPeriod": 5
+  }
+}]
