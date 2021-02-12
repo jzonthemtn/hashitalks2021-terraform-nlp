@@ -6,10 +6,6 @@ resource "aws_cloudwatch_log_group" "nlp-training" {
   name = "nlp-training"
 }
 
-resource "aws_cloudwatch_log_group" "nlp-serving" {
-  name = "nlp-serving"
-}
-
 data "aws_iam_policy_document" "cloudwatch_log_group_access_document" {
   statement {
     actions = [
