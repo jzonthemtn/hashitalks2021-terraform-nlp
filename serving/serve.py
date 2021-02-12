@@ -67,6 +67,10 @@ class NerModelService(object):
 
         return s
 
+    @cherrypy.expose
+    def status(self):
+        return "healthy"
+
 
 if __name__ == '__main__':
     cherrypy.config.update({'server.socket_host': '0.0.0.0', 'server.socket_port': 8080})
