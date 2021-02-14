@@ -2,6 +2,9 @@
 
 This repository contains the code for the [HashiTalks 2021](https://events.hashicorp.com/hashitalks2021) presentation.
 
+Jeff Zemerick
+David Smithbauer
+
 ## Summary
 
 This project facilitates the automated training and serving of NLP named-entity recognition models on AWS.
@@ -112,4 +115,3 @@ For training and serving on a GPU:
 ## License
 
 This project is licensed under the Apache License, version 2.0.
-Copyright 2021 Jeff Zemerick
