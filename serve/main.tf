@@ -119,7 +119,7 @@ EOF
 
 resource "aws_security_group" "alb_security_group" {
   vpc_id = data.aws_ssm_parameter.vpc.value
-  name   = "${var.name_prefix}-sg"
+  name   = "${var.name_prefix}-${var.model_key}-sg"
 
   ingress {
     from_port   = 0
@@ -138,7 +138,7 @@ resource "aws_security_group" "alb_security_group" {
 
 resource "aws_alb" "nlp_serving_alb" {
   name            = "${var.name_prefix}-serving-alb"
-  subnets         = [data.aws_ssm_parameter.subnet1, data.aws_ssm_parameter.subnet2]
+  subnets         = [data.aws_ssm_parameter.subnet1.value, data.aws_ssm_parameter.subnet2.value]
   security_groups = [aws_security_group.alb_security_group.id]
   enable_http2    = false
   idle_timeout    = 600
@@ -160,7 +160,7 @@ resource "aws_alb_listener" "front_end" {
 }
 
 resource "aws_alb_target_group" "target_group" {
-  name       = "${var.name_prefix}-serving-target-group"
+  name       = "${var.name_prefix}-${var.model_key}-serving-target-group"
   port       = 8080
   protocol   = "HTTP"
   vpc_id     = data.aws_ssm_parameter.vpc.value
