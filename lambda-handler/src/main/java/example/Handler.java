@@ -117,6 +117,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         runTaskRequest.setTaskDefinition(registerTaskDefinitionResult.getTaskDefinition().getTaskDefinitionArn());
         runTaskRequest.setLaunchType("EC2");
 
+        logger.log("Running task for model " + modelId);
         final RunTaskResult runTaskResult = ecs.runTask(runTaskRequest);
 
         /*final DeploymentController deploymentController = new DeploymentController();
