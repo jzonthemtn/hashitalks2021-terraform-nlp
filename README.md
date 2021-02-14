@@ -93,17 +93,15 @@ When model training is complete, the model and its associated files will be uplo
 
 ### Serving a Model
 
-To serve a model, run `serve.sh` giving it the name of the model to serve.
+To serve a model, change to the `serve` directory. Edit `variables.tf` to set the name of the model to serve and then run `terraform apply`.
 
-`./serve.sh my-model`
-
-This command will launch a model serving container on the ECS cluster for the given model. The model can then be used as:
+This will launch a service and task on the ECS cluster to serve the given given model. The model can then be used by referencing the output DNS name of the load balancer:
 
 ```
-curl -X POST http://$HOSTNAME:8080/ner --data "George Washington was president of the United States." -H "Content-type: text/plain"
+curl -X POST http://$ALB:8080/ner --data "George Washington was president of the United States." -H "Content-type: text/plain"
 ```
 
-The response will be a JSON-encoded list of entities (`George Washington` and `United States`) from the text.
+The response will be a JSON-encoded list of JSON entities (`George Washington` and `United States`) from the text. (THe actual output will vary based on the model's training and input text.)
 
 ## GPU
 
