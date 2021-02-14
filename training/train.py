@@ -32,7 +32,7 @@ table.update_item(
     Key={
         'modelId': args.model_id
     },
-    UpdateExpression="set status=:s",
+    UpdateExpression="set progress=:s",
     ExpressionAttributeValues={
         ':s': 'In Progress'
     }
@@ -72,7 +72,7 @@ table.update_item(
     Key={
         'modelId': args.model_id
     },
-    UpdateExpression="set status=:s",
+    UpdateExpression="set progress=:s",
     ExpressionAttributeValues={
         ':s': 'Completed'
     }
