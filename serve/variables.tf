@@ -1,21 +1,13 @@
+variable "region" {
+  default = "us-east-1"
+}
+
 variable "name_prefix" {
   default = "nlp-ner"
 }
 
-variable "bucket_name" {
-  default = "terraform-20210214004952724500000001"
-}
-
 variable "model_key" {
-  default = "nlp-ner"
-}
-
-variable "vpc_name" {
-  default = "nlp-ner-vpc"
-}
-
-variable "cluster" {
-  default = "nlp-ner-ecs"
+  default = "my-model"
 }
 
 variable "desired_count" {

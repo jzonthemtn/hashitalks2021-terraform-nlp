@@ -7,6 +7,18 @@ terraform {
   }
 }
 
+provider "aws" {
+  region = var.region
+}
+
+data "aws_ssm_parameter" "cluster" {
+  name = "${var.name_prefix}-ecs-cluster-name"
+}
+
+data "aws_ssm_parameter" "bucket_name" {
+  name = "${var.name_prefix}-s3-bucket"
+}
+
 #resource "aws_security_group_rule" "example" {
 #  type              = "ingress"
 #  from_port         = 0
@@ -17,8 +29,8 @@ terraform {
 #}
 
 resource "aws_ecs_service" "service" {
-  name                = "my-model-serving"
-  cluster             = var.cluster
+  name                = "${var.name_prefix}-${var.model_key}-serving"
+  cluster             = data.aws_ssm_parameter.cluster.value
   desired_count       = var.desired_count
   task_definition     = aws_ecs_task_definition.app.arn
   scheduling_strategy = "REPLICA"
@@ -29,7 +41,7 @@ resource "aws_ecs_service" "service" {
 
   #load_balancer {
   #  target_group_arn = var.target_group_arn
-  #  container_name   = "my-model-serving"
+  #  container_name   = "${var.name_prefix}-${model_key}-serving"
   #  container_port   = var.container_port
   #}
 }
@@ -38,19 +50,19 @@ data "template_file" "task_definition" {
   template = file("${path.module}/app.json")
 
   vars = {
-    bucket = "terraform-20210214004952724500000001"
-    key    = "my-model"
+    bucket = data.aws_ssm_parameter.bucket_name.value
+    key    = var.model_key
   }
 }
 
 resource "aws_ecs_task_definition" "app" {
-  family                = "my-model-serving"
+  family                = "${var.name_prefix}-${var.model_key}-serving"
   container_definitions = data.template_file.task_definition.rendered
   task_role_arn = aws_iam_role.task_role.arn
 }
 
 resource "aws_cloudwatch_log_group" "nlp-serving" {
-  name = "nlp-serving"
+  name = "${var.name_prefix}-${var.model_key}-serving"
 }
 
 resource "aws_iam_role_policy_attachment" "test-attach" {
@@ -88,12 +100,12 @@ resource "aws_iam_policy" "task_policy" {
     {
        "Effect":"Allow",
        "Action":["s3:ListBucket"],
-       "Resource":"arn:aws:s3:::${var.bucket_name}"
+       "Resource":"arn:aws:s3:::${data.aws_ssm_parameter.bucket_name.value}"
     },
     {
        "Effect":"Allow",
        "Action":["s3:*"],
-       "Resource":"arn:aws:s3:::${var.bucket_name}/*"
+       "Resource":"arn:aws:s3:::${data.aws_ssm_parameter.bucket_name.value}/*"
     }
   ]
 }
