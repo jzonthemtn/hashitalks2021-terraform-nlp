@@ -65,9 +65,6 @@ trainer.train('/tmp/' + args.model,
               embeddings_storage_mode='cpu')
 
 
-ecs_client = boto3.client('ecs', region_name=args.region)
-ecs_client.update_service(cluster=args.cluster, service=args.service, desiredCount=0)
-ecs_client.delete_service(cluster=args.cluster, service=args.service)
 table.update_item(
     Key={
         'modelId': args.model_id
