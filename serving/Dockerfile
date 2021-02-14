@@ -22,4 +22,4 @@ ENV MODEL_KEY=""
 
 EXPOSE 8080
 
-CMD python3.8 /tmp/serve.py
+CMD python3.8 /tmp/serve.py --b ${MODEL_BUCKET} --k ${MODEL_KEY}

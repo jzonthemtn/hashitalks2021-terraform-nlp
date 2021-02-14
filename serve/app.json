@@ -13,7 +13,7 @@
     "options": {
       "awslogs-group": "nlp-serving",
       "awslogs-region": "us-east-1",
-      "awslogs-stream-prefix": "my-model"
+      "awslogs-stream-prefix": "my-model/final-model.pt"
     }
   },
   "environment": [{
@@ -22,7 +22,7 @@
     },
     {
       "name": "MODEL_KEY",
-      "value": "fake-bucket"
+      "value": "my-model"
     }
   ],
   "healthCheck": {

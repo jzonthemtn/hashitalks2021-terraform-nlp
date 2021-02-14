@@ -3,7 +3,7 @@ variable "name_prefix" {
 }
 
 variable "bucket_name" {
-  default = "terraform-20210212135933787000000001"
+  default = "terraform-20210214004952724500000001"
 }
 
 variable "model_key" {

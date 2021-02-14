@@ -78,7 +78,7 @@ resource "aws_iam_policy" "task_policy" {
     },
     {
        "Effect":"Allow",
-       "Action":["s3:GetObject"],
+       "Action":["s3:*"],
        "Resource":"arn:aws:s3:::${var.bucket_name}/*"
     }
   ]

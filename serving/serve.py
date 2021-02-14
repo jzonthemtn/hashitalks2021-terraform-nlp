@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import argparse
 from flair.models import SequenceTagger
 from flair.data import Sentence
 import cherrypy
@@ -22,15 +23,13 @@ def obj_dict(obj):
     return obj.__dict__
 
 
-# The bucket that contains the mode.
-bucket = os.environ.get('MODEL_BUCKET')
-
-# The model S3 key.
-key = os.environ.get('MODEL_KEY')
+parser = argparse.ArgumentParser(description='Model Training')
+parser.add_argument('--b', action="store", dest='bucket', default="")
+parser.add_argument('--k', action="store", dest='key', default=20)
 
 # Download the model.
 s3 = boto3.resource('s3')
-s3.Bucket(bucket).download_file(key, '/tmp/final-model.pt')
+s3.Bucket(args.bucket).download_file(args.key, '/tmp/final-model.pt')
 
 model = SequenceTagger.load('/tmp/final-model.pt')
 
