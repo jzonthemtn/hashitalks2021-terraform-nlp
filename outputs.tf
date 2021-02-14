@@ -33,3 +33,9 @@ resource "aws_ssm_parameter" "param_s3_bucket" {
   type  = "String"
   value = aws_s3_bucket.bucket.id
 }
+
+resource "aws_ssm_parameter" "param_ecs_sg" {
+  name  = "${var.name_prefix}-ecs-sg"
+  type  = "String"
+  value = aws_security_group.ecs_sg.id
+}
