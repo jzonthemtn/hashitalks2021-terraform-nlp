@@ -32,8 +32,10 @@ args = parser.parse_args()
 #s3 = boto3.resource('s3')
 #s3.Bucket(args.bucket).download_file(args.key, '/tmp/final-model.pt')
 
+print("Downloading model s3://" + args.bucket + "/" + args.key)
 s3 = boto3.client('s3')
 s3.download_file(args.bucket, args.key + '/final-model.pt', '/tmp/final-model.pt')
+print("Model downloaded.")
 
 model = SequenceTagger.load('/tmp/final-model.pt')
 
