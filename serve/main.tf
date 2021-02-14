@@ -27,6 +27,11 @@ resource "aws_ecs_service" "service" {
 
 data "template_file" "task_definition" {
   template = file("${path.module}/app.json")
+
+  vars = {
+    bucket = "terraform-20210214004952724500000001"
+    key    = "my-model"
+  }
 }
 
 resource "aws_ecs_task_definition" "app" {

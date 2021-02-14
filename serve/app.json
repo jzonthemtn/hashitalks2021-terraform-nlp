@@ -18,18 +18,11 @@
   },
   "environment": [{
       "name": "MODEL_BUCKET",
-      "value": "us-east-1"
+      "value": "${bucket}"
     },
     {
       "name": "MODEL_KEY",
-      "value": "my-model"
+      "value": "${key}"
     }
-  ],
-  "healthCheck": {
-    "command": ["CMD-SHELL", "wget --quiet http://localhost:8080/health || exit 1"],
-    "retries": 3,
-    "timeout": 2,
-    "interval": 5,
-    "startPeriod": 5
-  }
+  ]
 }]
