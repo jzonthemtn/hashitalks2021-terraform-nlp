@@ -9,10 +9,9 @@ resource "aws_security_group" "ml_vpc_security_group" {
     protocol    = "tcp"
   }
 
-  # TODO: Restrict this.
   ingress {
     from_port   = 0
-    to_port     = 0
+    to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
@@ -61,8 +60,8 @@ resource "aws_security_group" "ecs_sg" {
   }
 
   ingress {
-    from_port   = 8080
-    to_port     = 8080
+    from_port   = 0
+    to_port     = 65535
     protocol    = "tcp"
     cidr_blocks = ["0.0.0.0/0"]
   }
