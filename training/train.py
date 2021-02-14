@@ -18,6 +18,8 @@ parser.add_argument('--v', action="store", dest='embeddings', default="distilber
 parser.add_argument('--i', action="store", dest='model_id', default="")
 parser.add_argument('--r', action="store", dest='region', default="us-east-1")
 parser.add_argument('--t', action="store", dest='table', default="")
+parser.add_argument('--c', action="store", dest='cluster', default="")
+parser.add_argument('--s', action="store", dest='service', default="")
 
 args = parser.parse_args()
 
@@ -28,13 +30,12 @@ dynamodb = boto3.resource('dynamodb', region_name=args.region)
 table = dynamodb.Table(args.table)
 table.update_item(
     Key={
-        'ModelID': args.model_id
+        'modelId': args.model_id
     },
-    UpdateExpression="set Progress=:s",
+    UpdateExpression="set progress=:s",
     ExpressionAttributeValues={
         ':s': 'In Progress'
-    },
-    ReturnValues="UPDATED_NEW"
+    }
 )
 
 
@@ -64,13 +65,15 @@ trainer.train('/tmp/' + args.model,
               embeddings_storage_mode='cpu')
 
 
+ecs_client = boto3.client('ecs', region_name=args.region)
+ecs_client.update_service(cluster=args.cluster, service=args.service, desiredCount=0)
+ecs_client.delete_service(cluster=args.cluster, service=args.service)
 table.update_item(
     Key={
-        'ModelID': args.model_id
+        'modelId': args.model_id
     },
-    UpdateExpression="set Progress=:s",
+    UpdateExpression="set progress=:s",
     ExpressionAttributeValues={
         ':s': 'Completed'
-    },
-    ReturnValues="UPDATED_NEW"
+    }
 )

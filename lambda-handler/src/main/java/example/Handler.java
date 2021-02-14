@@ -3,6 +3,10 @@ package example;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.document.*;
+import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
+import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSClientBuilder;
@@ -14,8 +18,10 @@ import com.amazonaws.services.lambda.runtime.events.ScheduledEvent;
 import com.amazonaws.services.sqs.AmazonSQS;
 import com.amazonaws.services.sqs.AmazonSQSClientBuilder;
 import com.amazonaws.services.sqs.model.Message;
+import com.amazonaws.util.CollectionUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import example.model.Model;
 import example.model.ModelTrainingRequest;
 import org.apache.commons.lang3.StringUtils;
 
@@ -103,9 +109,17 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         registerTaskDefinitionRequest.setFamily(modelTrainingRequest.getName());
         registerTaskDefinitionRequest.setTaskRoleArn(taskRoleArn);
 
-        ecs.registerTaskDefinition(registerTaskDefinitionRequest);
+        final RegisterTaskDefinitionResult registerTaskDefinitionResult = ecs.registerTaskDefinition(registerTaskDefinitionRequest);
 
-        final DeploymentController deploymentController = new DeploymentController();
+        final RunTaskRequest runTaskRequest = new RunTaskRequest();
+        runTaskRequest.setCluster(ecsClusterName);
+        runTaskRequest.setCount(1);
+        runTaskRequest.setTaskDefinition(registerTaskDefinitionResult.getTaskDefinition().getTaskDefinitionArn());
+        runTaskRequest.setLaunchType("EC2");
+
+        final RunTaskResult runTaskResult = ecs.runTask(runTaskRequest);
+
+        /*final DeploymentController deploymentController = new DeploymentController();
         deploymentController.setType("ECS");
 
         final CreateServiceRequest createServiceRequest = new CreateServiceRequest();
@@ -115,17 +129,17 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         createServiceRequest.setTaskDefinition(modelTrainingRequest.getName());
         createServiceRequest.setDeploymentController(deploymentController);
 
-        final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);
+        final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);*/
 
-        if(StringUtils.isNotEmpty(createServiceResult.getService().getServiceArn())) {
+        if(!CollectionUtils.isNullOrEmpty(runTaskResult.getTasks())) {
 
           final HashMap<String, AttributeValue> itemValues = new HashMap<>();
-          itemValues.put("ModelID", new AttributeValue(modelId));
-          itemValues.put("Image", new AttributeValue(modelTrainingRequest.getImage()));
-          itemValues.put("StartTime", new AttributeValue(String.valueOf(System.currentTimeMillis())));
-          itemValues.put("Progress", new AttributeValue("Pending"));
-          itemValues.put("ServiceName", new AttributeValue(createServiceResult.getService().getServiceName()));
-          itemValues.put("ServiceArn", new AttributeValue(createServiceResult.getService().getServiceArn()));
+          itemValues.put("modelId", new AttributeValue(modelId));
+          itemValues.put("image", new AttributeValue(modelTrainingRequest.getImage()));
+          itemValues.put("startTime", new AttributeValue(String.valueOf(System.currentTimeMillis())));
+          itemValues.put("status", new AttributeValue("Pending"));
+          //itemValues.put("ServiceName", new AttributeValue(createServiceResult.getService().getServiceName()));
+         // itemValues.put("ServiceArn", new AttributeValue(createServiceResult.getService().getServiceArn()));
           //itemValues.put("TaskId", new AttributeValue(createServiceResult.getService().getTaskSets().get(0).getId()));
 
           try {
@@ -146,7 +160,35 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
       }
 
-      // TODO: Go through the DynamoDB items. Any "Complete" should have their task/service deleted.
+      // Query the DynamoDB items. Any "Complete" should have their task/service deleted.
+      /*final DynamoDB dynamoDB = new DynamoDB(ddb);
+
+      final DynamoDBMapper mapper = new DynamoDBMapper(ddb);
+
+      final Table table = dynamoDB.getTable(tableName);
+
+      final QuerySpec spec = new QuerySpec().withKeyConditionExpression("Progress = :v_status")
+              .withValueMap(new ValueMap().withString(":v_status", "Completed"));
+
+      final ItemCollection<QueryOutcome> items = table.query(spec);
+
+      logger.log("Completed models: " + items.getTotalCount());
+
+      final Iterator<Item> iterator = items.iterator();
+
+      while(iterator.hasNext()) {
+
+        final Model model = gson.fromJson(iterator.next().toJSON(), Model.class);
+
+        // Delete the ECS service to clean up.
+        logger.log("Deleting ECS service " + model.getServiceName());
+        final DeleteServiceRequest deleteServiceRequest = new DeleteServiceRequest();
+        deleteServiceRequest.setCluster(ecsClusterName);
+        deleteServiceRequest.setService(model.getServiceName());
+        deleteServiceRequest.setForce(true);
+        ecs.deleteService(deleteServiceRequest);
+
+      }*/
 
       if(StringUtils.equalsIgnoreCase(debug, "true")) {
         logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
