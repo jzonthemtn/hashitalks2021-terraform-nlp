@@ -3,10 +3,6 @@ package example;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.document.*;
-import com.amazonaws.services.dynamodbv2.document.spec.QuerySpec;
-import com.amazonaws.services.dynamodbv2.document.utils.ValueMap;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.amazonaws.services.ecs.AmazonECS;
 import com.amazonaws.services.ecs.AmazonECSClientBuilder;
@@ -21,7 +17,6 @@ import com.amazonaws.services.sqs.model.Message;
 import com.amazonaws.util.CollectionUtils;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import example.model.Model;
 import example.model.ModelTrainingRequest;
 import org.apache.commons.lang3.StringUtils;
 
@@ -120,18 +115,6 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         logger.log("Running task for model " + modelId);
         final RunTaskResult runTaskResult = ecs.runTask(runTaskRequest);
 
-        /*final DeploymentController deploymentController = new DeploymentController();
-        deploymentController.setType("ECS");
-
-        final CreateServiceRequest createServiceRequest = new CreateServiceRequest();
-        createServiceRequest.setServiceName(modelId);
-        createServiceRequest.setCluster(ecsClusterName);
-        createServiceRequest.setDesiredCount(1);
-        createServiceRequest.setTaskDefinition(modelTrainingRequest.getName());
-        createServiceRequest.setDeploymentController(deploymentController);
-
-        final CreateServiceResult createServiceResult = ecs.createService(createServiceRequest);*/
-
         if(!CollectionUtils.isNullOrEmpty(runTaskResult.getTasks())) {
 
           final HashMap<String, AttributeValue> itemValues = new HashMap<>();
@@ -139,9 +122,6 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
           itemValues.put("image", new AttributeValue(modelTrainingRequest.getImage()));
           itemValues.put("startTime", new AttributeValue(String.valueOf(System.currentTimeMillis())));
           itemValues.put("progress", new AttributeValue("Pending"));
-          //itemValues.put("ServiceName", new AttributeValue(createServiceResult.getService().getServiceName()));
-         // itemValues.put("ServiceArn", new AttributeValue(createServiceResult.getService().getServiceArn()));
-          //itemValues.put("TaskId", new AttributeValue(createServiceResult.getService().getTaskSets().get(0).getId()));
 
           try {
 
@@ -160,36 +140,6 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
         }
 
       }
-
-      // Query the DynamoDB items. Any "Complete" should have their task/service deleted.
-      /*final DynamoDB dynamoDB = new DynamoDB(ddb);
-
-      final DynamoDBMapper mapper = new DynamoDBMapper(ddb);
-
-      final Table table = dynamoDB.getTable(tableName);
-
-      final QuerySpec spec = new QuerySpec().withKeyConditionExpression("Progress = :v_status")
-              .withValueMap(new ValueMap().withString(":v_status", "Completed"));
-
-      final ItemCollection<QueryOutcome> items = table.query(spec);
-
-      logger.log("Completed models: " + items.getTotalCount());
-
-      final Iterator<Item> iterator = items.iterator();
-
-      while(iterator.hasNext()) {
-
-        final Model model = gson.fromJson(iterator.next().toJSON(), Model.class);
-
-        // Delete the ECS service to clean up.
-        logger.log("Deleting ECS service " + model.getServiceName());
-        final DeleteServiceRequest deleteServiceRequest = new DeleteServiceRequest();
-        deleteServiceRequest.setCluster(ecsClusterName);
-        deleteServiceRequest.setService(model.getServiceName());
-        deleteServiceRequest.setForce(true);
-        ecs.deleteService(deleteServiceRequest);
-
-      }*/
 
       if(StringUtils.equalsIgnoreCase(debug, "true")) {
         logger.log("ENVIRONMENT VARIABLES: " + gson.toJson(System.getenv()));
