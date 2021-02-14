@@ -23,14 +23,17 @@ def obj_dict(obj):
     return obj.__dict__
 
 
-parser = argparse.ArgumentParser(description='Model Training')
+parser = argparse.ArgumentParser(description='Model Serving')
 parser.add_argument('--b', action="store", dest='bucket', default="")
 parser.add_argument('--k', action="store", dest='key', default=20)
 args = parser.parse_args()
 
 # Download the model.
-s3 = boto3.resource('s3')
-s3.Bucket(args.bucket).download_file(args.key, '/tmp/final-model.pt')
+#s3 = boto3.resource('s3')
+#s3.Bucket(args.bucket).download_file(args.key, '/tmp/final-model.pt')
+
+s3 = boto3.client('s3')
+s3.download_file(args.bucket, args.key + '/final-model.pt', '/tmp/final-model.pt')
 
 model = SequenceTagger.load('/tmp/final-model.pt')
 
