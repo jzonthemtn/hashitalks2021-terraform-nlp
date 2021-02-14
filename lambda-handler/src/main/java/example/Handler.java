@@ -75,7 +75,7 @@ public class Handler implements RequestHandler<ScheduledEvent, String> {
 
         final ContainerDefinition containerDefinition = new ContainerDefinition();
         containerDefinition.setName(modelTrainingRequest.getName());
-        containerDefinition.setMemoryReservation(100);
+        containerDefinition.setMemoryReservation(1024);
         containerDefinition.setMemory(4096);
         containerDefinition.setImage(modelTrainingRequest.getImage());
 
