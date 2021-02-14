@@ -26,6 +26,7 @@ def obj_dict(obj):
 parser = argparse.ArgumentParser(description='Model Training')
 parser.add_argument('--b', action="store", dest='bucket', default="")
 parser.add_argument('--k', action="store", dest='key', default=20)
+args = parser.parse_args()
 
 # Download the model.
 s3 = boto3.resource('s3')
