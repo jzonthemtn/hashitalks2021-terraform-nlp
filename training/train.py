@@ -23,7 +23,7 @@ parser.add_argument('--s', action="store", dest='service', default="")
 
 args = parser.parse_args()
 
-corpus: Corpus = WIKINER_ENGLISH().downsample(0.01)
+corpus: Corpus = WIKINER_ENGLISH().downsample(0.1)
 
 dynamodb = boto3.resource('dynamodb', region_name=args.region)
 
