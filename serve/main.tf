@@ -160,7 +160,7 @@ resource "aws_alb_listener" "front_end" {
 }
 
 resource "aws_alb_target_group" "target_group" {
-  name       = "${var.name_prefix}-${var.model_key}-serving-target-group"
+  name       = "${var.name_prefix}-${var.model_key}-serving-gp"
   port       = 8080
   protocol   = "HTTP"
   vpc_id     = data.aws_ssm_parameter.vpc.value
