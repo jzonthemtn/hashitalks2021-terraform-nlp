@@ -137,7 +137,7 @@ resource "aws_security_group" "alb_security_group" {
 }
 
 resource "aws_alb" "nlp_serving_alb" {
-  name            = "${var.name_prefix}-serving-alb"
+  name            = "${var.name_prefix}-${var.model_key}-serving-alb"
   subnets         = [data.aws_ssm_parameter.subnet1.value, data.aws_ssm_parameter.subnet2.value]
   security_groups = [aws_security_group.alb_security_group.id]
   enable_http2    = false
