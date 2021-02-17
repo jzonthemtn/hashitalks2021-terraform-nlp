@@ -79,8 +79,6 @@ This step creates:
 
 To delete the resources and clean up run `terraform destroy`.
 
-> Note: if you have any model trainings in progress when trying to delete the delete will hang. This is because the ECS services and tasks for the model training were not created by Terraform. Just manually delete those services and tasks first and the destroy will succeed.
-
 #### Lambda Function
 
 The Lambda function is deployed via Terraform. It is a Java 11 function that is triggered by an Amazon EventBridge (CloudWatch Events) Rule. The function consumes messages from the SQS queue. The function is parameterized through environment variables set by the terraform script.
