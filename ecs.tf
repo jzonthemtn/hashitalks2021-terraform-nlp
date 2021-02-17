@@ -188,4 +188,8 @@ resource "aws_autoscaling_group" "failure_analysis_ecs_asg" {
 
 resource "aws_ecs_cluster" "ecs_cluster" {
   name = "${var.name_prefix}-ecs"
+  setting {
+    name  = "containerInsights"
+    value = "enabled"
+  }
 }
