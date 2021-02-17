@@ -2,8 +2,8 @@
 
 This repository contains the code for the [HashiTalks 2021](https://events.hashicorp.com/hashitalks2021) presentation.
 
-Jeff Zemerick
-David Smithbauer
+* Jeff Zemerick
+* David Smithbauer
 
 ## Summary
 
@@ -19,7 +19,9 @@ Attendees of this talk will come away with a working knowledge of how a machine 
 
 ## Usage
 
-To get started first clone this repository. **Note that this project will create resources outside the AWS free tier.**
+To get started first clone this repository.
+
+> **Note: this project will create resources outside the AWS free tier. You are responsible for all associated costs/charges.**
 
 ### Building the Containers
 
@@ -44,7 +46,7 @@ Now build and push the serving container:
 ```
 cd serving
 ./build-image.sh
-docker push $DOCKERHUB_USERNAME/ner-serve:latest
+docker push $DOCKERHUB_USERNAME/ner-serving:latest
 ```
 
 ### Building the Lambda Function
@@ -75,7 +77,9 @@ This step creates:
 * An S3 bucket that will contain the trained models and their associated files.
 * A DynamoDB table that will contain metadata about the models.
 
-To delete the resources and clean up run `terraform destroy`. Note that if you have any model trainings in progress when trying to delete the delete will hang. This is because the ECS services and tasks for the model training were not created by Terraform. Just manually delete those services and tasks first and the destroy will succeed.
+To delete the resources and clean up run `terraform destroy`.
+
+> Note: if you have any model trainings in progress when trying to delete the delete will hang. This is because the ECS services and tasks for the model training were not created by Terraform. Just manually delete those services and tasks first and the destroy will succeed.
 
 #### Lambda Function
 
@@ -93,7 +97,7 @@ When model training is complete, the model and its associated files will be uplo
 
 ### Serving a Model
 
-To serve a model, change to the `serve` directory. Edit `variables.tf` to set the name of the model to serve and then run `terraform apply`.
+To serve a model, change to the `serve` directory. Edit `variables.tf` to set the name of the model to serve and then run `terraform init` and `terraform apply`.
 
 This will launch a service and task on the ECS cluster to serve the given given model. The model can then be used by referencing the output DNS name of the load balancer:
 
@@ -101,7 +105,9 @@ This will launch a service and task on the ECS cluster to serve the given given 
 curl -X POST http://$ALB:8080/ner --data "George Washington was president of the United States." -H "Content-type: text/plain"
 ```
 
-The response will be a JSON-encoded list of JSON entities (`George Washington` and `United States`) from the text. (THe actual output will vary based on the model's training and input text.)
+The response will be a JSON-encoded list of JSON entities (`George Washington` and `United States`) from the text. (The actual output will vary based on the model's training and input text.)
+
+> Note: if you receive a `503 Service Temporarily Unavailable` response, be patient and try again in a few moments.
 
 ## GPU
 
